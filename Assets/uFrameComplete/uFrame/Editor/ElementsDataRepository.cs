@@ -172,7 +172,7 @@ public class ElementsDataRepository : DefaultElementsRepository
         {
             controllerGenerator.AddSceneManager(sceneManager);
             var filePath = GetContainerCustomFileFullPath(sceneManager.Name);
-            if (Type.GetType(UFrameAssetManager.DesignerVMAssemblyName.Replace("ViewModel", sceneManager.NameAsSceneManager)) == null && !File.Exists(filePath))
+            if (Type.GetType(UFrameAssetManager.DesignerVMAssemblyName.Replace("ViewModel", sceneManager.NameAsSceneManager)) == null && sceneManager.SubSystem != null && !File.Exists(filePath))
             {
                 var containerGenerator = new ControllerFileGenerator(Diagram) { IsDesignerFile = false };
                 containerGenerator.AddSceneManager(sceneManager);
