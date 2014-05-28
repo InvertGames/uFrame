@@ -527,19 +527,18 @@ public class ViewFileGenerator : ElementGenerator
 
         decl.Members.Add(removeHandlerMethod);
 
-        var createHandlerMethod = new CodeMemberMethod()
-        {
-            Attributes = MemberAttributes.Public,
-            Name = collectionProperty.NameAsCreateHandler,
-            ReturnType = new CodeTypeReference(typeof(ViewBase))
-        };
-        createHandlerMethod.Statements.Add(new CodeMethodReturnStatement(new CodeMethodInvokeExpression(new CodeThisReferenceExpression(), "InstantiateView", new CodeVariableReferenceExpression(varName))));
-
-        createHandlerMethod.Parameters.Add(new CodeParameterDeclarationExpression(varTypeName, varName));
-        decl.Members.Add(createHandlerMethod);
-
         if (relatedElement != null)
         {
+            var createHandlerMethod = new CodeMemberMethod()
+            {
+                Attributes = MemberAttributes.Public,
+                Name = collectionProperty.NameAsCreateHandler,
+                ReturnType = new CodeTypeReference(typeof(ViewBase))
+            };
+            createHandlerMethod.Statements.Add(new CodeMethodReturnStatement(new CodeMethodInvokeExpression(new CodeThisReferenceExpression(), "InstantiateView", new CodeVariableReferenceExpression(varName))));
+            createHandlerMethod.Parameters.Add(new CodeParameterDeclarationExpression(varTypeName, varName));
+            decl.Members.Add(createHandlerMethod);
+
             statements.Add(
                 new CodeSnippetExpression(string.Format("var binding = this.BindToViewCollection(() => {0}.{1})", modelName,
                     collectionProperty.FieldName)));
