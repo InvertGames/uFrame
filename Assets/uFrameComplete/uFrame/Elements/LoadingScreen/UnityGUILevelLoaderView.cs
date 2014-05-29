@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 
 public class UnityGUILevelLoaderView : LevelLoaderView
 {
@@ -6,8 +6,37 @@ public class UnityGUILevelLoaderView : LevelLoaderView
     public Texture progressForground;
     public Texture background;
 
+    public string[] layersToDisable = { "Everything" };
+
+    private LayerMask _oldMask;
+    private bool _areLayersDisabled = false;
+
+    public override void Bind()
+    {
+        base.Bind();
+        Model._Progress.PropertyChanged += _Progress_PropertyChanged;
+    }
+
+    void _Progress_PropertyChanged(object value)
+    {
+        if ((float)value == 1 && Camera.main != null)
+        {
+            Camera.main.cullingMask = _oldMask;
+        }
+    }
+
     public void OnGUI()
     {
+        if (!_areLayersDisabled && Camera.main != null)
+        {
+            _areLayersDisabled = true;
+            _oldMask = Camera.main.cullingMask;
+            for (int i = 0; i < layersToDisable.Length; i++)
+            {
+                Camera.main.cullingMask &= ~(1 << LayerMask.NameToLayer(layersToDisable[i]));
+            }
+        }
+
         var size = new Vector2(150, 25);
         var x = Screen.width / 2f - (size.x / 2f);
         var y = Screen.height / 2f - (size.y / 2f);
