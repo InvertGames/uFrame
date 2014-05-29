@@ -1,6 +1,8 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
+VisualStudioVersion = 12.0.21005.1
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnityVS.uFrame.CSharp", "UnityVS.uFrame.CSharp.csproj", "{94884F10-9A97-0493-2D7D-A85C4D2E9315}"
 EndProject
 Project("{1FAC5C55-277D-4884-94A4-83DBDAF57E56}") = "UnityVS.uFrame.UnityScript", "UnityVS.uFrame.UnityScript.unityproj", "{BE0EBD5F-7735-0CBC-8434-73A4923B6D84}"
@@ -8,6 +10,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnityVS.uFrame.CSharp.Editor", "UnityVS.uFrame.CSharp.Editor.csproj", "{68BE0193-FE40-BD95-D644-D5C75A89F7D9}"
 EndProject
 Project("{1FAC5C55-277D-4884-94A4-83DBDAF57E56}") = "UnityVS.uFrame.UnityScript.Editor", "UnityVS.uFrame.UnityScript.Editor.unityproj", "{3ACA45AB-51EF-F403-FD8F-7007EE25297E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Invert.uFrame.Editor", "Invert.uFrame.Editor\Invert.uFrame.Editor.csproj", "{93FAEB5C-683E-4093-89CE-6082890A331E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -31,6 +35,10 @@ Global
 		{3ACA45AB-51EF-F403-FD8F-7007EE25297E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3ACA45AB-51EF-F403-FD8F-7007EE25297E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3ACA45AB-51EF-F403-FD8F-7007EE25297E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{93FAEB5C-683E-4093-89CE-6082890A331E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{93FAEB5C-683E-4093-89CE-6082890A331E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{93FAEB5C-683E-4093-89CE-6082890A331E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{93FAEB5C-683E-4093-89CE-6082890A331E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
