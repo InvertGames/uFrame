@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using UnityEngine;
 
@@ -123,7 +123,7 @@ public class ViewContainer : ViewModelObserver
     public ViewBase InstantiateView(GameObject prefab, ViewModel model, Vector3 position,
         Quaternion rotation)
     {
-        return transform.InstantiateView(model, position, rotation);
+        return transform.InstantiateView(prefab, model, position, rotation);
     }
 
     public Coroutine LoadAdditive(string rootObjectName, string levelName, Action<GameObject> complete = null)
