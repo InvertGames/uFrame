@@ -14,5 +14,7 @@ public class CheckersSceneManager : CheckersSceneManagerBase {
     
     public override void Setup() {
         base.Setup();
+      
+
     }
 }

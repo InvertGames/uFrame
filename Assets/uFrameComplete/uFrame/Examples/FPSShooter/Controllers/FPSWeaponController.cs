@@ -8,7 +8,6 @@ public class FPSWeaponController : FPSWeaponControllerBase
 {
     public override void NextZoom(FPSWeaponViewModel fpsWeapon)
     {
-        
         if (fpsWeapon.MaxZooms - 1 == fpsWeapon.ZoomIndex)
         {
             fpsWeapon.ZoomIndex = 0;
@@ -37,9 +36,15 @@ public class FPSWeaponController : FPSWeaponControllerBase
     public override void EndFire(FPSWeaponViewModel weapon)
     {
         weapon.State = FPSWeaponState.Active;
-        if (weapon.Ammo < 1)
+    }
+
+    public override void BulletFired(FPSWeaponViewModel fPSWeapon)
+    {
+        base.BulletFired(fPSWeapon);
+        fPSWeapon.Ammo -= 1;
+        if (fPSWeapon.Ammo < 1)
         {
-            weapon.State = FPSWeaponState.Empty;
+            fPSWeapon.State = FPSWeaponState.Empty;
         }
     }
 

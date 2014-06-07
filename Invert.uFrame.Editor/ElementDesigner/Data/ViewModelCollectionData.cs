@@ -14,11 +14,6 @@ public class ViewModelCollectionData : DiagramSubItem, IViewModelItem
         get { return false; }
     }
 
-    public IEnumerable<ElementItemType> GetAvailableRelatedTypes(IElementsDataRepository repository)
-    {
-        return repository.GetAvailableTypes(false);
-    }
-
     [SerializeField]
     private string _itemType;
 

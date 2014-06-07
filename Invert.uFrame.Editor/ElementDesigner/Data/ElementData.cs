@@ -139,23 +139,6 @@ public class ElementData : ElementDataBase, IDiagramFilter
         return new RenameElementRefactorer(this);
     }
 
-    [DiagramContextMenu("Open Controller File", 10)]
-    public void OpenController(IElementsDataRepository repository)
-    {
-        var filename = repository.GetControllerCustomFilename(this.Name);
-
-        var scriptAsset = AssetDatabase.LoadAssetAtPath(filename, typeof(TextAsset));
-
-        AssetDatabase.OpenAsset(scriptAsset);
-    }
-    [DiagramContextMenu("Open View Model File", 11)]
-    public void OpenViewModel(IElementsDataRepository repository)
-    {
-        var filename = repository.GetViewModelCustomFilename(this.Name);
-        var scriptAsset = AssetDatabase.LoadAssetAtPath(filename, typeof(TextAsset));
-        AssetDatabase.OpenAsset(scriptAsset);
-    }
-
     public bool ImportedOnly
     {
         get { return true; }
@@ -255,10 +238,7 @@ public class ElementData : ElementDataBase, IDiagramFilter
         if (t == typeof(ViewData)) return true;
         if (t == typeof(ElementData)) return false;
         if (t == typeof(EnumData)) return false;
-
-
         return true;
-
     }
 
     public bool IsItemAllowed(object item, Type t)

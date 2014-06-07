@@ -139,8 +139,8 @@ public abstract class CheckerBoardViewBase : ViewBase {
     public override ViewModel CreateModel() {
         return this.RequestViewModel(GameManager.Container.Resolve<CheckerBoardController>());
     }
-    
-    protected override void InitializeViewModel(ViewModel viewModel) {
+
+    public override void InitializeViewModel(ViewModel viewModel) {
     }
 }
 
@@ -173,8 +173,8 @@ public abstract class CheckerMoveViewBase : ViewBase {
     public override ViewModel CreateModel() {
         return this.RequestViewModel(GameManager.Container.Resolve<CheckerMoveController>());
     }
-    
-    protected override void InitializeViewModel(ViewModel viewModel) {
+
+    public override void InitializeViewModel(ViewModel viewModel) {
     }
 }
 
@@ -298,8 +298,8 @@ public abstract class CheckerPlateViewBase : ViewBase {
     public virtual void ExecuteSelectCommand() {
         this.ExecuteCommand(CheckerPlate.SelectCommand);
     }
-    
-    protected override void InitializeViewModel(ViewModel viewModel) {
+
+    public override void InitializeViewModel(ViewModel viewModel) {
         CheckerPlateViewModel checkerPlate = ((CheckerPlateViewModel)(viewModel));
         checkerPlate.CanMoveTo = this._CanMoveTo;
         checkerPlate.Position = this._Position;
@@ -557,8 +557,8 @@ public abstract class CheckersGameViewBase : ViewBase {
     public virtual void ExecuteGameOver() {
         this.ExecuteCommand(CheckersGame.GameOver);
     }
-    
-    protected override void InitializeViewModel(ViewModel viewModel) {
+
+    public override void InitializeViewModel(ViewModel viewModel) {
         CheckersGameViewModel checkersGame = ((CheckersGameViewModel)(viewModel));
         checkersGame.BlackScore = this._BlackScore;
         checkersGame.Board = this._Board == null ? null : this._Board.ViewModelObject as CheckerBoardViewModel;
@@ -717,8 +717,8 @@ public abstract class CheckerViewBase : ViewBase {
     public virtual void ExecuteSelectCommand() {
         this.ExecuteCommand(Checker.SelectCommand);
     }
-    
-    protected override void InitializeViewModel(ViewModel viewModel) {
+
+    public override void InitializeViewModel(ViewModel viewModel) {
         CheckerViewModel checker = ((CheckerViewModel)(viewModel));
         checker.IsKingMe = this._IsKingMe;
         checker.Position = this._Position;
@@ -757,8 +757,8 @@ public abstract class AICheckersGameViewBase : CheckersGameViewBase {
     public override ViewModel CreateModel() {
         return this.RequestViewModel(GameManager.Container.Resolve<AICheckersGameController>());
     }
-    
-    protected override void InitializeViewModel(ViewModel viewModel) {
+
+    public override void InitializeViewModel(ViewModel viewModel) {
         base.InitializeViewModel(viewModel);
     }
 }
@@ -796,8 +796,8 @@ public abstract class MainMenuViewBase : ViewBase {
     public virtual void ExecutePlay() {
         this.ExecuteCommand(MainMenu.Play);
     }
-    
-    protected override void InitializeViewModel(ViewModel viewModel) {
+
+    public override void InitializeViewModel(ViewModel viewModel) {
     }
 }
 

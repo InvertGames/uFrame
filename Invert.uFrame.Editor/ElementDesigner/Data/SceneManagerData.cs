@@ -24,6 +24,13 @@ public class SceneManagerData : DiagramItem
             return Type.GetType(UFrameAssetManager.DesignerVMAssemblyName.Replace("ViewModel", NameAsSceneManager));
         }
     }
+    public Type CurrentSettingsType
+    {
+        get
+        {
+            return Type.GetType(UFrameAssetManager.DesignerVMAssemblyName.Replace("ViewModel", NameAsSettings));
+        }
+    }
     public override string Label
     {
         get { return Name; }
@@ -37,28 +44,12 @@ public class SceneManagerData : DiagramItem
         //if (scItem == null) return;
         //Transitions.Add(new SceneManagerTransition() { ToIdentifier = scItem.Name,Name ="To" + scItem.Name });
     }
-    [DiagramContextMenu("Open Code")]
-    public void OpenSceneManager(IElementsDataRepository repository)
-    {
-        var filename = repository.GetContainerCustomFilename(this.Name);
-        var scriptAsset = AssetDatabase.LoadAssetAtPath(filename, typeof(TextAsset));
-        AssetDatabase.OpenAsset(scriptAsset);
-    }
+
     public override bool CanCreateLink(IDrawable target)
     {
         return false;
     }
-    //[DiagramContextMenu("Create Scene", -10)]
-    //public void CreateScene(ElementsDataRepository repository)
-    //{
-    //    repository.CreateNewScene(this);
-    //}
-    [DiagramContextMenu("Create Scene", -9)]
-    public void CreateScene(IElementsDataRepository repository)
-    {
-        
-        repository.CreateScene(this);
-    }
+
     [DiagramContextMenu("Add to scene", 0)]
     public void AddToScene()
     {
@@ -152,10 +143,10 @@ public class SceneManagerData : DiagramItem
     {
         return new RenameSceneManagerRefactorer(this);
     }
-    public override void EndEditing(IElementsDataRepository repository)
+    public override void EndEditing()
     {
     
-        base.EndEditing(repository);
+        base.EndEditing();
     }
 
     public RenameSceneManagerRefactorer RenameRefactor { get; set; }

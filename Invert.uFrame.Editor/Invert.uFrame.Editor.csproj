@@ -11,14 +11,14 @@
     <AssemblyName>Invert.uFrame.Editor</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <TargetFrameworkProfile>Unity Subset v3.5</TargetFrameworkProfile>
+    <TargetFrameworkProfile>Unity Full v3.5</TargetFrameworkProfile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
+    <DebugType>pdbonly</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;DLL</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
@@ -26,7 +26,7 @@
     <DebugType>none</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
+    <DefineConstants>TRACE;DLL</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
@@ -49,14 +49,57 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\Assets\uFrameComplete\uFrame\Base\Controllers\GameContainer.cs">
+      <Link>GameContainer.cs</Link>
+    </Compile>
+    <Compile Include="..\Assets\uFrameComplete\uFrame\Base\Controllers\IGameContainer.cs">
+      <Link>IGameContainer.cs</Link>
+    </Compile>
+    <Compile Include="..\Assets\uFrameComplete\uFrame\Base\Controllers\InjectAttribute.cs">
+      <Link>InjectAttribute.cs</Link>
+    </Compile>
+    <Compile Include="CodeFileGenerator.cs" />
+    <Compile Include="CodeGenerator.cs" />
+    <Compile Include="UI\ContextMenuUI.cs" />
+    <Compile Include="DiagramItemGenerator.cs" />
+    <Compile Include="ElementDesigner\Commands\Diagram\AddNewCommand.cs" />
+    <Compile Include="ElementDesigner\Commands\Diagram\AutoLayoutCommand.cs" />
+    <Compile Include="ElementDesigner\Commands\Hooks\CommandHook.cs" />
+    <Compile Include="ElementDesigner\Commands\Hooks\CommandHookLifetime.cs" />
+    <Compile Include="ElementDesigner\Commands\Hooks\CommandHookMode.cs" />
+    <Compile Include="ElementDesigner\Commands\Context\ContextEditorCommand.cs" />
+    <Compile Include="ElementDesigner\Commands\Diagram\ContextMenuCommand.cs" />
+    <Compile Include="ElementDesigner\Commands\Context\UFContextMenuItem.cs" />
+    <Compile Include="ElementDesigner\Commands\Diagram\EditorCommand.cs" />
+    <Compile Include="ElementDesigner\Commands\Elements\AddElementCollectionCommand.cs" />
+    <Compile Include="ElementDesigner\Commands\Elements\AddElementPropertyCommand.cs" />
+    <Compile Include="ElementDesigner\Commands\Elements\AddEnumItemCommand.cs" />
+    <Compile Include="ElementDesigner\Commands\Elements\AddElementCommandCommand.cs" />
+    <Compile Include="ElementDesigner\Commands\Context\IContextMenuItem.cs" />
+    <Compile Include="ElementDesigner\Commands\Context\IContextMenuItemCommand.cs" />
+    <Compile Include="ElementDesigner\Commands\IDynamicOptionsCommand.cs" />
+    <Compile Include="ElementDesigner\Commands\IParentCommand.cs" />
+    <Compile Include="ElementDesigner\Commands\Nodes\AddNewElementCommand.cs" />
+    <Compile Include="ElementDesigner\Commands\Nodes\AddNewEnumCommand.cs" />
+    <Compile Include="ElementDesigner\Commands\Nodes\AddNewSceneManagerCommand.cs" />
+    <Compile Include="ElementDesigner\Commands\Nodes\AddNewSubSystemCommand.cs" />
+    <Compile Include="ElementDesigner\Commands\Nodes\AddNewViewCommand.cs" />
+    <Compile Include="ElementDesigner\Commands\Nodes\AddNewViewComponentCommand.cs" />
+    <Compile Include="ElementDesigner\Commands\Nodes\AddItemCommand.cs" />
+    <Compile Include="ElementDesigner\Commands\Toolbar\IToolbarCommand.cs" />
+    <Compile Include="ElementDesigner\Commands\MultiOptionType.cs" />
+    <Compile Include="ElementDesigner\Commands\Diagram\PopToFilterCommand.cs" />
+    <Compile Include="ElementDesigner\Commands\Diagram\SaveCommand.cs" />
+    <Compile Include="ElementDesigner\Commands\Toolbar\ToolbarCommand.cs" />
+    <Compile Include="ElementDesigner\Commands\Toolbar\ToolbarPosition.cs" />
     <Compile Include="ElementDesigner\Data\AdditiveSceneData.cs" />
     <Compile Include="ElementDesigner\Data\DiagramSubItem.cs" />
     <Compile Include="ElementDesigner\Data\PluginData.cs" />
     <Compile Include="ElementDesigner\DefaultElementsRepository.cs" />
     <Compile Include="ElementDesigner\Links\AssociationLink.cs" />
     <Compile Include="ElementDesigner\Links\BeizureLink.cs" />
-    <Compile Include="ElementDesigner\Commands\DiagramCommand.cs" />
-    <Compile Include="ElementDesigner\Commands\IDiagramCommand.cs" />
+    <Compile Include="ElementDesigner\Interfaces\IRefactoring.cs" />
+    <Compile Include="ElementDesigner\Commands\Diagram\IEditorCommand.cs" />
     <Compile Include="ElementDesigner\ContextMenuItem.cs" />
     <Compile Include="ElementDesigner\Filters\DefaultFilter.cs" />
     <Compile Include="ElementDesigner\DiagramContextMenuAttribute.cs" />
@@ -88,6 +131,8 @@
     <Compile Include="ElementDesigner\Links\ViewComponentLink.cs" />
     <Compile Include="ElementDesigner\Drawers\ViewDrawer.cs" />
     <Compile Include="ElementDesigner\Links\ViewLink.cs" />
+    <Compile Include="ElementDesigner\Commands\ICommandHandler.cs" />
+    <Compile Include="UI\ICommandUI.cs" />
     <Compile Include="Refactoring\ChangeParameterTypeRefactor.cs" />
     <Compile Include="Refactoring\RefactorContext.cs" />
     <Compile Include="Refactoring\Refactorer.cs" />
@@ -100,6 +145,8 @@
     <Compile Include="Refactoring\RenameSceneManagerRefactorer.cs" />
     <Compile Include="Refactoring\RenameViewComponentRefactorer.cs" />
     <Compile Include="Refactoring\RenameViewRefactorer.cs" />
+    <Compile Include="UI\ToolbarUI.cs" />
+    <Compile Include="uFrameEditor.cs" />
     <Compile Include="Windows\CompilingWindow.cs" />
     <Compile Include="Extensions\EditorExtensions.cs" />
     <Compile Include="ElementDesigner\Drawers\DiagramItem.cs" />
@@ -135,11 +182,12 @@
     <Compile Include="Extensions\uFrameVersionProcessor.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\UBehaviours.Editor\Invert.uBehaviours.Editor.csproj">
-      <Project>{8798C199-235A-4A93-A018-CAAB690CBBBE}</Project>
+    <ProjectReference Include="..\Invert.uBehaviours.Editor\Invert.uBehaviours.Editor.csproj">
+      <Project>{b9147095-b836-4396-875f-9a1aeb8e94cf}</Project>
       <Name>Invert.uBehaviours.Editor</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>copy $(TargetPath) $(SolutionDir)Assets\uFrameComplete\uFrame\Editor\ /Y

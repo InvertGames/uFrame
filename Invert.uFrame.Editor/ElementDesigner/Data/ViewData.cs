@@ -15,6 +15,9 @@ public class ViewData : DiagramItem, ISubSystemType
     [SerializeField]
     private List<string> _componentIdentifiers = new List<string>();
 
+    [SerializeField]
+    private string _baseViewIdentifier;
+
     public IEnumerable<ViewComponentData> Components
     {
         get { return Data.ViewComponents.Where(p => ComponentIdentifiers.Contains(p.Identifier)); }
@@ -35,23 +38,14 @@ public class ViewData : DiagramItem, ISubSystemType
         }
     }
 
-    [DiagramContextMenu("Open Code")]
-    public void OpenView(IElementsDataRepository repository)
-    {
-        var filename = repository.GetViewCustomFilename(this.Name);
-
-        var scriptAsset = AssetDatabase.LoadAssetAtPath(filename, typeof(TextAsset));
-
-        AssetDatabase.OpenAsset(scriptAsset);
-    }
     public override RenameRefactorer CreateRenameRefactorer()
     {
         return new RenameViewRefactorer(this);
     }
-    public override void EndEditing(IElementsDataRepository repository)
+    public override void EndEditing()
     {
         var oldAssemblyName = AssemblyQualifiedName;
-        base.EndEditing(repository);
+        base.EndEditing();
         foreach (var v in Data.Views.Where(p => p.ForAssemblyQualifiedName == oldAssemblyName))
         {
             v.ForAssemblyQualifiedName = AssemblyQualifiedName;
@@ -63,6 +57,46 @@ public class ViewData : DiagramItem, ISubSystemType
         get
         {
             return Data.ViewModels.FirstOrDefault(p => p.AssemblyQualifiedName == ForAssemblyQualifiedName);
+        }
+    }
+
+    /// <summary>
+    /// The identifier to the base view this view will derived from
+    /// </summary>
+    public string BaseViewIdentifier
+    {
+        get { return _baseViewIdentifier; }
+        set { _baseViewIdentifier = value; }
+    }
+    /// <summary>
+    /// The name of the view that this view will derive from
+    /// </summary>
+    public string BaseViewName
+    {
+        get
+        {
+            var baseView = BaseView;
+            if (baseView != null)
+            {
+                return baseView.NameAsView;
+            }
+            var element = ViewForElement;
+            if (element != null)
+            {
+                return element.NameAsViewBase;
+            }
+            return "[None]";
+        }
+    }
+    /// <summary>
+    /// The baseview class if any
+    /// </summary>
+    public ViewData BaseView
+    {
+        get
+        {
+            if (string.IsNullOrEmpty(BaseViewIdentifier)) return null;
+            return Data.Views.FirstOrDefault(p => p.Identifier == BaseViewIdentifier);
         }
     }
 
@@ -189,7 +223,10 @@ public class ViewData : DiagramItem, ISubSystemType
         if (viewData != null)
         {
             viewData.ForAssemblyQualifiedName = null;
+            viewData.BaseViewIdentifier = null;
         }
+        //viewData.BaseViewIdentifier = null;
+        BaseViewIdentifier = null;
         //var elementData = target as ElementData;
         //if (target is )
     }

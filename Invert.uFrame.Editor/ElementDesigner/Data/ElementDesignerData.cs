@@ -20,25 +20,24 @@ public class ElementDesignerData : ScriptableObject, IRefactorable
     [SerializeField]
     private Color _subSystemLinkColor = Color.grey;
 
-[SerializeField]
+    [SerializeField]
     private Color _inheritanceLinkColor = Color.red;
 
-[SerializeField]
-private Color _SceneManagerLinkColor = Color.yellow;
+    [SerializeField]
+    private Color _SceneManagerLinkColor = Color.yellow;
 
-[SerializeField]
-private Color _viewLinkColor = Color.magenta;
+    [SerializeField]
+    private Color _viewLinkColor = Color.magenta;
 
-[SerializeField, HideInInspector]
+    [SerializeField, HideInInspector]
     private List<EnumData> _enums = new List<EnumData>();
 
     private Stack<IDiagramFilter> _filterStack;
 
-[SerializeField, HideInInspector]
+    [SerializeField, HideInInspector]
     private DefaultFilter _defaultFilter = new DefaultFilter();
 
-    [SerializeField]
-    private bool _generateViewBindings = true;
+   
 
     [SerializeField, HideInInspector]
     private List<ImportedElementData> _importedElements = new List<ImportedElementData>();
@@ -56,7 +55,7 @@ private Color _viewLinkColor = Color.magenta;
     private float _snapSize = 10f;
     [SerializeField, HideInInspector]
     private List<SubSystemData> _subSystems = new List<SubSystemData>();
-    [SerializeField,HideInInspector]
+    [SerializeField, HideInInspector]
     private string _version;
 
     [SerializeField, HideInInspector]
@@ -69,8 +68,32 @@ private Color _viewLinkColor = Color.magenta;
 
     [SerializeField, HideInInspector]
     private List<PluginData> _pluginItems = new List<PluginData>();
+    [SerializeField, HideInInspector]
+    private string _codePathStrategyName = "Default";
 
     private static DiagramPlugin[] _plugins;
+
+    public string ControllersFileName
+    {
+        get
+        {
+            return name + "Controllers.designer.cs";
+        }
+    }
+    public string ViewModelsFileName
+    {
+        get
+        {
+            return name + ".designer.cs";
+        }
+    }
+    public string ViewsFileName
+    {
+        get
+        {
+            return name + "Views.designer.cs";
+        }
+    }
 
     public IEnumerable<IDiagramItem> AllDiagramItems
     {
@@ -78,12 +101,12 @@ private Color _viewLinkColor = Color.magenta;
         {
             return
                 ViewModels.Cast<IDiagramItem>()
-                .Concat(ImportedElements.Cast<IDiagramItem>())
-                .Concat(Enums.Cast<IDiagramItem>())
-                .Concat(Views.Cast<IDiagramItem>())
-                .Concat(SceneManagers.Cast<IDiagramItem>())
-                .Concat(SubSystems.Cast<IDiagramItem>())
-                .Concat(ViewComponents.Cast<IDiagramItem>()
+                    .Concat(ImportedElements.Cast<IDiagramItem>())
+                    .Concat(Enums.Cast<IDiagramItem>())
+                    .Concat(Views.Cast<IDiagramItem>())
+                    .Concat(SceneManagers.Cast<IDiagramItem>())
+                    .Concat(SubSystems.Cast<IDiagramItem>())
+                    .Concat(ViewComponents.Cast<IDiagramItem>()
                 );
         }
     }
@@ -160,11 +183,7 @@ private Color _viewLinkColor = Color.magenta;
         get { return AllDiagramItems.OfType<IDiagramFilter>(); }
     }
 
-    public bool GenerateViewBindings
-    {
-        get { return _generateViewBindings; }
-        set { _generateViewBindings = value; }
-    }
+
 
     public IEnumerable<IDiagramItem> ImportableItems
     {
@@ -333,6 +352,18 @@ private Color _viewLinkColor = Color.magenta;
         }
     }
 
+    public string GetUniqueName(string name)
+    {
+        var tempName = name;
+        var index = 1;
+        while (AllDiagramItems.Any(p => p.Name.ToUpper() == tempName.ToUpper()))
+        {
+            tempName = name + index;
+            index++;
+        }
+        return tempName;
+    }
+
     public ElementDataBase[] GetAssociatedElements(ElementDataBase data)
     {
         return GetAssociatedElementsInternal(data).Concat(new[] { data }).Distinct().ToArray();
@@ -378,7 +409,13 @@ private Color _viewLinkColor = Color.magenta;
             PopFilter();
         }
     }
-
+    public void PopToFilter(string filterName)
+    {
+        while (CurrentFilter.Name != filterName)
+        {
+            PopFilter();
+        }
+    }
     public void PushFilter(IDiagramFilter filter)
     {
         FilterLeave();
@@ -410,7 +447,7 @@ private Color _viewLinkColor = Color.magenta;
     {
         CleanUpFilters();
         Links.Clear();
-        
+
         var items = DiagramItems.SelectMany(p => p.Items).Where(p => CurrentFilter.IsItemAllowed(p, p.GetType())).ToArray();
         var diagramItems = this.DiagramItems.ToArray();
         foreach (var item in items)
@@ -441,7 +478,7 @@ private Color _viewLinkColor = Color.magenta;
         }
     }
 
-   
+
 
     protected IEnumerable<IDiagramItem> FilterItems(IEnumerable<IDiagramItem> allDiagramItems)
     {
@@ -498,7 +535,7 @@ private Color _viewLinkColor = Color.magenta;
             return
                 AllDiagramItems.OfType<IRefactorable>()
                     .SelectMany(p => p.Refactorings)
-                    .Concat(AllDiagramItems.SelectMany(p => p.Items).OfType<IRefactorable>().SelectMany(p=>p.Refactorings))
+                    .Concat(AllDiagramItems.SelectMany(p => p.Items).OfType<IRefactorable>().SelectMany(p => p.Refactorings))
                     .ToList();
         }
     }
@@ -509,13 +546,23 @@ private Color _viewLinkColor = Color.magenta;
         set { _pluginItems = value; }
     }
 
-    public void Applied()
+    public string AssetPath { get; set; }
+
+    public string CodePathStrategyName
+    {
+        get { return string.IsNullOrEmpty(_codePathStrategyName) ? "Default" : _codePathStrategyName; }
+        set { _codePathStrategyName = value; }
+    }
+
+    public ICodePathStrategy CodePathStrategy { get; set; }
+
+    public void RefactorApplied()
     {
         var refactorables = AllDiagramItems.OfType<IRefactorable>()
             .Concat(AllDiagramItems.SelectMany(p => p.Items).OfType<IRefactorable>());
         foreach (var refactorable in refactorables)
         {
-            refactorable.Applied();
+            refactorable.RefactorApplied();
         }
     }
 }

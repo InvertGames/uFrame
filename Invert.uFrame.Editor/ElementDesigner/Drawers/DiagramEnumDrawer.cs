@@ -1,10 +1,13 @@
 using System.Collections.Generic;
 using System.Linq;
+using Invert.uFrame.Editor.ElementDesigner.Commands;
 using UnityEditor;
 using UnityEngine;
 
 public class DiagramEnumDrawer : DiagramItemDrawer<EnumData>
 {
+    private DiagramItemHeader _itemsHeader;
+
     public override GUIStyle BackgroundStyle
     {
         get
@@ -18,31 +21,33 @@ public class DiagramEnumDrawer : DiagramItemDrawer<EnumData>
     //{
     //    get { return UFStyles.Item6; }
     //}
+    public DiagramEnumDrawer()
+    {
+    }
 
     public DiagramEnumDrawer(EnumData data, ElementsDiagram diagram)
         : base(data, diagram)
     {
-        ItemsHeader = new DiagramItemHeader()
-        {
-            Label = "EnumItems",
-            HeaderType = typeof(EnumData)
-        };
-        ItemsHeader.OnAddItem += ItemsHeaderOnOnAddItem;
+
     }
 
-    private void ItemsHeaderOnOnAddItem()
+    public DiagramItemHeader ItemsHeader
     {
-        Undo.RecordObject(Diagram.Data, "Add New Enum");
-        Data.EnumItems.Add(new EnumItem()
+        get
         {
-            Name = "Start" + (Data.EnumItems.Count + 1)
-        });
-        CalculateBounds();
-        Diagram.Refresh(true);
-        EditorUtility.SetDirty(Diagram.Data);
-    }
 
-    public DiagramItemHeader ItemsHeader { get; set; }
+            if (_itemsHeader == null)
+            {
+                _itemsHeader = Container.Resolve<DiagramItemHeader>();
+                _itemsHeader.Label = "Items";
+                _itemsHeader.HeaderType = typeof(EnumData);
+                _itemsHeader.AddCommand = Container.Resolve<AddEnumItemCommand>();
+            }
+
+            return _itemsHeader;
+        }
+        set { _itemsHeader = value; }
+    }
 
     protected override IEnumerable<DiagramSubItemGroup> GetItemGroups()
     {

@@ -1,259 +1,366 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using UnityEngine;
 
-/// <summary>
-/// A ViewModel Container and a factory for Controllers and commands.
-/// </summary>
-public class GameContainer : IGameContainer
+#if DLL
+
+namespace Invert.uFrame
 {
-    private Dictionary<Type, object> _instances;
-    private Dictionary<Type, Type> _mappings;
-    private Dictionary<string, object> _namedInstances;
-
-    public Dictionary<Type, Type> Mappings
-    {
-        get { return _mappings ?? (_mappings = new Dictionary<Type, Type>()); }
-        set { _mappings = value; }
-    }
-
-    protected Dictionary<Type, object> Instances
-    {
-        get { return _instances ?? (_instances = new Dictionary<Type, object>()); }
-        set { _instances = value; }
-    }
-
-    protected Dictionary<string, object> NamedInstances
-    {
-        get { return _namedInstances ?? (_namedInstances = new Dictionary<string, object>()); }
-        set { _namedInstances = value; }
-    }
-    public GameContainer()
-    {
-
-    }
+#endif
 
     /// <summary>
-    /// Clears all type-mappings and instances.
+    /// A ViewModel Container and a factory for Controllers and commands.
     /// </summary>
-    public void Clear()
-    {
-        Instances.Clear();
-        NamedInstances.Clear();
-        Mappings.Clear();
-    }
+#if DLL
+    public class uFrameContainer : IUFrameContainer
+#else
+public class GameContainer : IGameContainer
+#endif
 
-    /// <summary>
-    /// Injects registered types/mappings into an object
-    /// </summary>
-    /// <param name="obj"></param>
-    public void Inject(object obj)
     {
-        if (obj == null) return;
+        private TypeInstanceCollection _instances;
+        private TypeMappingCollection _mappings;
 
-        var members = obj.GetType().GetMembers();
-        foreach (var memberInfo in members)
+
+        public TypeMappingCollection Mappings
         {
-            var injectAttribute = memberInfo.GetCustomAttributes(typeof(InjectAttribute), true).FirstOrDefault() as InjectAttribute;
-            if (injectAttribute != null)
+            get { return _mappings ?? (_mappings = new TypeMappingCollection()); }
+            set { _mappings = value; }
+        }
+
+        protected TypeInstanceCollection Instances
+        {
+            get { return _instances ?? (_instances = new TypeInstanceCollection()); }
+            set { _instances = value; }
+        }
+
+        public Dictionary<Type, Dictionary<Type, Type>> AdapterMappings
+        {
+            get { return _adapterMappings; }
+            set { _adapterMappings = value; }
+        }
+
+
+
+        public IEnumerable<TType> ResolveAll<TType>()
+        {
+            foreach (var obj in ResolveAll(typeof(TType)))
             {
+                yield return (TType) obj;
+            }
+        }
 
-                if (memberInfo is PropertyInfo)
+        /// <summary>
+        /// Resolves all instances of TType or subclasses of TType.  Either named or not.
+        /// </summary>
+        /// <typeparam name="TType">The Type to resolve</typeparam>
+        /// <returns>List of objects.</returns>
+       public IEnumerable<object> ResolveAll(Type type)
+        {
+            foreach (var instance1 in Instances.Where(p => p.Base == type && !string.IsNullOrEmpty(p.Name)))
+            {
+                yield return instance1.Instance;
+            }
+
+            foreach (var mapping in Mappings)
+            {
+                if (!string.IsNullOrEmpty(mapping.Name))
                 {
-                    var propertyInfo = memberInfo as PropertyInfo;
-                    if (string.IsNullOrEmpty(injectAttribute.Name))
+                    if (type.IsAssignableFrom(mapping.From))
                     {
-                        var injectInstance = Instances.ContainsKey(propertyInfo.PropertyType)
-                            ? Instances[propertyInfo.PropertyType]
-                            : null;
-                        if (injectInstance != null)
-                        {
-                            propertyInfo.SetValue(obj, injectInstance, null);
-                        }
+                        var item = Activator.CreateInstance(mapping.To);
+                        Inject(item);
+                        yield return item;
                     }
-                    else
-                    {
-                        if (NamedInstances.ContainsKey(injectAttribute.Name))
-                        {
-                            propertyInfo.SetValue(obj, NamedInstances[injectAttribute.Name], null);
-                        }
-                    }
-
-                }
-                else if (memberInfo is FieldInfo)
-                {
-                    var fieldInfo = memberInfo as FieldInfo;
-                    if (string.IsNullOrEmpty(injectAttribute.Name))
-                    {
-                        var injectInstance = Instances.ContainsKey(fieldInfo.FieldType) ? Instances[fieldInfo.FieldType] : null;
-                        if (injectInstance != null)
-                        {
-                            if (fieldInfo.FieldType != obj.GetType())
-                                Inject(injectInstance);
-
-                            fieldInfo.SetValue(obj, injectInstance);
-                        }
-                    }
-                    else
-                    {
-                        if (NamedInstances.ContainsKey(injectAttribute.Name))
-                        {
-                            fieldInfo.SetValue(obj, NamedInstances[injectAttribute.Name]);
-                        }
-                    }
-
                 }
             }
         }
-    }
-
-    /// <summary>
-    /// Register a type mapping
-    /// </summary>
-    /// <typeparam name="TSource">The base type.</typeparam>
-    /// <typeparam name="TTarget">The concrete type</typeparam>
-    public void Register<TSource, TTarget>()
-    {
-        if (Mappings.ContainsKey(typeof(TSource)))
+        /// <summary>
+        /// Clears all type-mappings and instances.
+        /// </summary>
+        public void Clear()
         {
-            Mappings[typeof(TSource)] = typeof(TTarget);
-            return;
-        }
-        Mappings.Add(typeof(TSource), typeof(TTarget));
-    }
-
-    /// <summary>
-    /// Register an instance of a type.
-    /// </summary>
-    /// <typeparam name="TBase"></typeparam>
-    /// <param name="instance"></param>
-    /// <param name="injectNow"></param>
-    /// <returns></returns>
-    public TBase RegisterInstance<TBase>(TBase instance = null, bool injectNow = true) where TBase : class
-    {
-        return RegisterInstance(typeof(TBase), instance, injectNow) as TBase;
-    }
-
-    /// <summary>
-    /// Register a named instance
-    /// </summary>
-    /// <param name="name">The name for the instance to be resolved.</param>
-    /// <param name="instance">The instance that will be resolved be the name</param>
-    /// <param name="injectNow">Perform the injection immediately</param>
-    public void RegisterInstance(string name, object instance, bool injectNow = true)
-    {
-        if (NamedInstances.ContainsKey(name))
-        {
-            NamedInstances[name] = instance;
-        }
-        else
-        {
-            NamedInstances.Add(name, instance);
-        }
-        if (injectNow)
-        {
-            Inject(instance);
-        }
-    }
-
-    /// <summary>
-    /// Register an instance of a type.
-    /// </summary>
-    /// <param name="type">The type of the instance</param>
-    /// <param name="instance"></param>
-    /// <returns></returns>
-    public object RegisterInstance(Type type, object instance = null, bool injectNow = true)
-    {
-        var model = instance ?? Activator.CreateInstance(type);
-
-        if (injectNow)
-            Inject(model);
-
-        // If its a derived type lets register that type too
-        var modelType = model.GetType();
-        if (type != modelType)
-        {
-            if (Instances.ContainsKey(modelType))
-                Instances[modelType] = model;
-            else
-                Instances.Add(modelType, model);
+            Instances.Clear();
+            Mappings.Clear();
+            AdapterMappings.Clear();
         }
 
-        // Register the instance
-        if (Instances.ContainsKey(type))
-            Instances[type] = model;
-        else
-            Instances.Add(type, model);
-
-        return model;
-    }
-
-    /// <summary>
-    ///  If an instance of T exist then it will return that instance otherwise it will create a new one based off mappings.
-    /// </summary>
-    /// <typeparam name="T">The type of instance to resolve</typeparam>
-    /// <returns>The/An instance of 'instanceType'</returns>
-    public T Resolve<T>() where T : class
-    {
-        return (T)Resolve(typeof(T));
-    }
-
-    /// <summary>
-    /// Resolve by the name
-    /// </summary>
-    /// <typeparam name="T"></typeparam>
-    /// <param name="name"></param>
-    /// <returns></returns>
-    public T Resolve<T>(string name) where T : class
-    {
-        if (NamedInstances.ContainsKey(name))
+        /// <summary>
+        /// Injects registered types/mappings into an object
+        /// </summary>
+        /// <param name="obj"></param>
+        public void Inject(object obj)
         {
-            return NamedInstances[name] as T;
-        }
-        return null;
-    }
+            if (obj == null) return;
 
-    /// <summary>
-    /// If an instance of instanceType exist then it will return that instance otherwise it will create a new one based off mappings.
-    /// </summary>
-    /// <param name="instanceType">The type of instance to resolve</param>
-    /// <param name="requireInstance">If true will return null if an instance isn't registered.</param>
-    /// <returns>The/An instance of 'instanceType'</returns>
-    public object Resolve(Type instanceType, bool requireInstance = false)
-    {
-        if (!Instances.ContainsKey(instanceType))
-        {
-            if (requireInstance)
+            var members = obj.GetType().GetMembers();
+            foreach (var memberInfo in members)
             {
+                var injectAttribute =
+                    memberInfo.GetCustomAttributes(typeof(InjectAttribute), true).FirstOrDefault() as InjectAttribute;
+                if (injectAttribute != null)
+                {
+                    if (memberInfo is PropertyInfo)
+                    {
+                        var propertyInfo = memberInfo as PropertyInfo;
+                        propertyInfo.SetValue(obj, Resolve(propertyInfo.PropertyType, injectAttribute.Name), null);
+                    }
+                    else if (memberInfo is FieldInfo)
+                    {
+                        var fieldInfo = memberInfo as FieldInfo;
+                        fieldInfo.SetValue(obj, Resolve(fieldInfo.FieldType, injectAttribute.Name));
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Register a type mapping
+        /// </summary>
+        /// <typeparam name="TSource">The base type.</typeparam>
+        /// <typeparam name="TTarget">The concrete type</typeparam>
+        public void Register<TSource, TTarget>(string name = null)
+        {
+            Mappings[typeof(TSource), name] = typeof(TTarget);
+        }
+
+        public void Register(Type source, Type target, string name = null)
+        {
+            Mappings[source, name] = target;
+        }
+
+        /// <summary>
+        /// Register a named instance
+        /// </summary>
+        /// <param name="baseType">The type to register the instance for.</param>        
+        /// <param name="instance">The instance that will be resolved be the name</param>
+        /// <param name="injectNow">Perform the injection immediately</param>
+        public void RegisterInstance(Type baseType, object instance = null, bool injectNow = true)
+        {
+            RegisterInstance(baseType, instance, null, injectNow);
+        }
+
+        /// <summary>
+        /// Register a named instance
+        /// </summary>
+        /// <param name="baseType">The type to register the instance for.</param>
+        /// <param name="name">The name for the instance to be resolved.</param>
+        /// <param name="instance">The instance that will be resolved be the name</param>
+        /// <param name="injectNow">Perform the injection immediately</param>
+        public void RegisterInstance(Type baseType, object instance = null, string name = null, bool injectNow = true)
+        {
+
+
+            Instances[baseType, name] = instance;
+            if (injectNow)
+            {
+                Inject(instance);
+            }
+        }
+
+        public void RegisterInstance<TBase>(TBase instance) where TBase : class
+        {
+            RegisterInstance<TBase>(instance, true);
+        }
+
+        public void RegisterInstance<TBase>(TBase instance, bool injectNow) where TBase : class
+        {
+            RegisterInstance<TBase>(instance, null, injectNow);
+        }
+
+        public void RegisterInstance<TBase>(TBase instance, string name, bool injectNow = true) where TBase : class
+        {
+            RegisterInstance(typeof(TBase), instance, name, injectNow);
+        }
+
+        /// <summary>
+        ///  If an instance of T exist then it will return that instance otherwise it will create a new one based off mappings.
+        /// </summary>
+        /// <typeparam name="T">The type of instance to resolve</typeparam>
+        /// <returns>The/An instance of 'instanceType'</returns>
+        public T Resolve<T>(string name = null, bool requireInstance = false) where T : class
+        {
+            return (T)Resolve(typeof(T), name, requireInstance);
+        }
+
+        /// <summary>
+        /// If an instance of instanceType exist then it will return that instance otherwise it will create a new one based off mappings.
+        /// </summary>
+        /// <param name="baseType">The type of instance to resolve</param>
+        /// <param name="name">The type of instance to resolve</param>
+        /// <param name="requireInstance">If true will return null if an instance isn't registered.</param>
+        /// <returns>The/An instance of 'instanceType'</returns>
+        public object Resolve(Type baseType, string name = null, bool requireInstance = false)
+        {
+            // Look for an instance first
+            var item = Instances[baseType, name];
+            if (item != null)
+            {
+                return item;
+            }
+            if (requireInstance)
+                return null;
+            // Check if there is a mapping of the type
+            var namedMapping = Mappings[baseType, name];
+            if (namedMapping != null)
+            {
+                var obj = Activator.CreateInstance(namedMapping);
+                Inject(obj);
+                return obj;
+            }
+            return null;
+        }
+
+        public void InjectAll()
+        {
+            foreach (var instance in Instances)
+            {
+                Inject(instance.Instance);
+            }
+            foreach (var namedInstance in Instances)
+            {
+                Inject(namedInstance.Instance);
+            }
+        }
+
+        private Dictionary<Type, Dictionary<Type, Type>> _adapterMappings = new Dictionary<Type, Dictionary<Type, Type>>();
+        public void RegisterRelation<TFor, TBase, TConcrete>()
+        {
+            if (AdapterMappings.ContainsKey(typeof(TFor)))
+            {
+                var dictionary = AdapterMappings[typeof(TFor)] ?? (AdapterMappings[typeof(TFor)] = new Dictionary<Type, Type>());
+                if (dictionary.ContainsKey(typeof(TBase)))
+                {
+                    dictionary[typeof(TBase)] = typeof(TConcrete);
+                }
+                else
+                {
+                    dictionary.Add(typeof(TBase), typeof(TConcrete));
+                }
+            }
+            else
+            {
+                AdapterMappings.Add(typeof(TFor), new Dictionary<Type, Type>());
+                AdapterMappings[typeof(TFor)].Add(typeof(TBase), typeof(TConcrete));
+            }
+        }
+
+        public TBase ResolveRelation<TBase>(Type tfor)
+        {
+
+            if (!AdapterMappings.ContainsKey(tfor)) return default(TBase);
+            var dictionary = AdapterMappings[tfor];
+            if (dictionary == null || !dictionary.ContainsKey(typeof(TBase))) return default(TBase);
+
+            var result = (TBase)Activator.CreateInstance(dictionary[typeof(TBase)]);
+            Inject(result);
+            return result;
+        }
+        public TBase ResolveRelation<TFor, TBase>()
+        {
+
+            if (!AdapterMappings.ContainsKey(typeof(TFor)))
+                return default(TBase);
+            var dictionary = AdapterMappings[typeof(TFor)];
+            if (dictionary == null || !dictionary.ContainsKey(typeof(TBase))) return default(TBase);
+
+            var result = (TBase)Activator.CreateInstance(dictionary[typeof(TBase)]);
+            Inject(result);
+            return result;
+        }
+    }
+    public class TypeMapping
+    {
+        public Type From
+        {
+            get;
+            set;
+        }
+
+        public Type To
+        {
+            get;
+            set;
+        }
+        public string Name { get; set; }
+    }
+    public class TypeMappingCollection : List<TypeMapping>
+    {
+        public Type this[Type from, string name = null]
+        {
+            get
+            {
+                var mapping = this.FirstOrDefault(p => p.From == from && p.Name == name);
+                if (mapping != null)
+                {
+                    return mapping.To;
+                }
                 return null;
             }
-            if (Mappings.ContainsKey(instanceType))
+            set
             {
-                var obj = Activator.CreateInstance(Mappings[instanceType]);
-                Inject(obj);
-                return obj;
-            }
-            else
-            {
-                var obj = Activator.CreateInstance(instanceType);
-                Inject(obj);
-                return obj;
+                var mapping = this.FirstOrDefault(p => p.From == from && p.Name == name);
+                if (mapping == null)
+                {
+                    Add(new TypeMapping() { From = from, Name = name, To = value });
+                }
+                else
+                {
+                    mapping.To = value;
+                    mapping.Name = name;
+                }
             }
         }
-        return Instances[instanceType];
     }
-
-    public void InjectAll()
+    public class TypeInstanceCollection : List<RegisteredInstance>
     {
-        foreach (var instance in Instances)
+
+        public object this[Type from, string name = null]
         {
-            Inject(instance.Value);
-        }
-        foreach (var namedInstance in NamedInstances)
-        {
-            Inject(namedInstance.Value);
+            get
+            {
+                var mapping = this.FirstOrDefault(p => p.Base == from && p.Name == name);
+                if (mapping != null)
+                {
+                    return mapping.Instance;
+                }
+                return null;
+            }
+            set
+            {
+                var mapping = this.FirstOrDefault(p => p.Base == from && p.Name == name);
+                if (mapping == null)
+                {
+                    Add(new RegisteredInstance() { Base = from, Name = name, Instance = value });
+                }
+                else
+                {
+                    mapping.Instance = value;
+                    mapping.Name = name;
+                }
+            }
         }
     }
 
+    public class RegisteredInstance
+    {
+        public Type Base
+        {
+            get;
+            set;
+        }
+
+        public object Instance
+        {
+            get;
+            set;
+        }
+
+        public string Name { get; set; }
+    }
+#if DLL
 }
+
+#endif

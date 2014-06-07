@@ -140,10 +140,6 @@ public class ViewModelCommandData : DiagramSubItem, IViewModelItem
         return new RenameCommandRefactorer(this);
     }
 
-    public IEnumerable<ElementItemType> GetAvailableRelatedTypes(IElementsDataRepository repository)
-    {
-        return repository.GetAvailableTypes(true, true);
-    }
 
     public override IEnumerable<IDiagramLink> GetLinks(IDiagramItem[] data)
     {
@@ -180,8 +176,8 @@ public class ViewModelCommandData : DiagramSubItem, IViewModelItem
         if (data != null)
         {
             data.Commands.Remove(this);
-            foreach (var SceneManagerData in data.Data.SceneManagers)
-                SceneManagerData.Transitions.RemoveAll(p => p.CommandIdentifier == this.Identifier);
+            foreach (var sceneManagerData in data.Data.SceneManagers)
+                sceneManagerData.Transitions.RemoveAll(p => p.CommandIdentifier == this.Identifier);
             data.Dirty = true;
         }
     }
@@ -192,9 +188,9 @@ public class ViewModelCommandData : DiagramSubItem, IViewModelItem
         RelatedType = null;
     }
 
-    public override void Rename(IElementsDataRepository repository, IDiagramItem data, string name)
+    public override void Rename(IDiagramItem data, string name)
     {
-        base.Rename(repository, data, name);
+        base.Rename(data, name);
         foreach (var sceneManagerData in data.Data.SceneManagers)
         {
             foreach (var transition in sceneManagerData.Transitions.ToArray())

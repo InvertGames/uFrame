@@ -1,5 +1,9 @@
 [u]Frame Release Notes
 IMPORTANT!!!: REGENERATE ANY DIAGRAMS!
+1.1
+- Modified: Dependency injection RegisterInstance has some reordered parameters to illeminate confusion and odd overloads
+
+
 1.06 5/10/2014
 - Fixed: Heirarchy Icons going missing
 - Fixed: When creating views that are not connected they won't be generated as an empty file.

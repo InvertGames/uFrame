@@ -27,7 +27,7 @@ public abstract class View<TModel> : ViewBase where TModel : ViewModel, new()
         get { return typeof(TModel); }
     }
 
-    protected sealed override void InitializeViewModel(ViewModel model)
+    public sealed override void InitializeViewModel(ViewModel model)
     {
         InitializeViewModel(model as TModel);
     }

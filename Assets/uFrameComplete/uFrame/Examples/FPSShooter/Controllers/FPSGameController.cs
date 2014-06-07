@@ -40,7 +40,7 @@ public class FPSGameController : FPSGameControllerBase
     public override void InitializeFPSGame(FPSGameViewModel fPSGame)
     {
         UnityEngine.Debug.Log("Weapon Count" + fPSGame.CurrentPlayer.Weapons.Count);
-        Container.RegisterInstance("LocalPlayer", fPSGame.CurrentPlayer);
+        //Container.RegisterInstance(fPSGame.CurrentPlayer, "LocalPlayer");
         
     }
 

@@ -1,22 +1,21 @@
-﻿using Invert.uFrame.Editor.ElementDesigner.Data;
+using System.Collections.Generic;
+using Invert.uFrame;
+using Invert.uFrame.Editor.ElementDesigner;
+using Invert.uFrame.Editor.ElementDesigner.Data;
 using UnityEditor;
+using UnityEngine;
 
 namespace Assets.uFrameComplete.uFrame.Editor.DiagramPlugins
 {
     public class UBehavioursPlugin : DiagramPlugin
     {
-        public override IElementDrawer GetDrawer(ElementsDiagram diagram, IDiagramItem data)
-        {
-            if (data is ViewData)
-            {
-                return new UBehavioursViewDrawer(data as ViewData,diagram);
-            }
-            return null;
-        }
+  
 
-        public override void OnAddContextItems(ElementsDiagram diagram, GenericMenu menu)
+        public override void Initialize(uFrameContainer container)
         {
-            
+            container.RegisterInstance(new AddNewBehaviourCommand());
+            container.RegisterRelation<ViewData,IElementDrawer,UBehavioursViewDrawer>();
+
         }
     }
 }

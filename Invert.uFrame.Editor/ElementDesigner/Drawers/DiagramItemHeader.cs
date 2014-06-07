@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Invert.uFrame.Editor.ElementDesigner;
 using UnityEngine;
 
 public class DiagramItemHeader : IDrawable
@@ -11,15 +12,15 @@ public class DiagramItemHeader : IDrawable
 
     public event AddItemClickedEventHandler OnAddItem;
 
+    public IEditorCommand AddCommand { get; set; }
+
     protected virtual void OnOnAddItem()
     {
         AddItemClickedEventHandler handler = OnAddItem;
         if (handler != null) handler();
     }
 
-
-
-    public void Draw(float scale,GUIStyle textColorStyle)
+    public void Draw(ElementsDiagram diagram, float scale,GUIStyle textColorStyle)
     {
         var style = UFStyles.HeaderStyle;//.Scale(scale);
         style.normal.textColor = textColorStyle.normal.textColor;
@@ -31,11 +32,11 @@ public class DiagramItemHeader : IDrawable
         btnRect.x = Position.x + Position.width - 18;
         btnRect.width = 16;
         btnRect.height = 16;
-        if (OnAddItem != null)
+        if (AddCommand != null)
         {
             if (GUI.Button(btnRect.Scale(scale), string.Empty, UFStyles.AddButtonStyle))
             {
-                OnOnAddItem();
+                diagram.ExecuteCommand(AddCommand,diagram.MouseOverViewData.Model);
             }    
         }
         

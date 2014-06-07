@@ -1,71 +1,112 @@
-﻿using System;
+using System;
+using System.Collections.Generic;
+
+#if DLL
+
+namespace Invert.uFrame
+{
+    public interface IUFrameContainer
+#else
 
 public interface IGameContainer
-{
-    /// <summary>
-    /// Clears all type mappings and instances.
-    /// </summary>
-    void Clear();
-    /// <summary>
-    /// Injects registered types/mappings into an object
-    /// </summary>
-    /// <param name="obj"></param>
-    void Inject(object obj);
+#endif
 
-    /// <summary>
-    /// Register a type mapping
-    /// </summary>
-    /// <typeparam name="TSource">The base type.</typeparam>
-    /// <typeparam name="TTarget">The concrete type</typeparam>
-    void Register<TSource, TTarget>();
+    {
+        /// <summary>
+        /// Clears all type mappings and instances.
+        /// </summary>
+        void Clear();
 
-    /// <summary>
-    /// Register an instance of a type.
-    /// </summary>
-    /// <typeparam name="TBase"></typeparam>
-    /// <param name="default"></param>
-    /// <returns></returns>
-    TBase RegisterInstance<TBase>(TBase @default = null, bool injectNow = true) where TBase : class;
+        /// <summary>
+        /// Injects registered types/mappings into an object
+        /// </summary>
+        /// <param name="obj"></param>
+        void Inject(object obj);
 
-    /// <summary>
-    /// Register an instance of a type.
-    /// </summary>
-    /// <param name="type"></param>
-    /// <param name="default"></param>
-    /// <returns></returns>
-    object RegisterInstance(Type type, object @default = null, bool injectNow = true);
+        /// <summary>
+        /// Injects everything that is registered at once
+        /// </summary>
+        void InjectAll();
 
-    /// <summary>
-    ///  If an instance of T exist then it will return that instance otherwise it will create a new one based off mappings.
-    /// </summary>
-    /// <typeparam name="T">The type of instance to resolve</typeparam>
-    /// <returns>The/An instance of 'instanceType'</returns>
-    T Resolve<T>() where T : class;
+        /// <summary>
+        /// Register a type mapping
+        /// </summary>
+        /// <typeparam name="TSource">The base type.</typeparam>
+        /// <typeparam name="TTarget">The concrete type</typeparam>
+        void Register<TSource, TTarget>(string name = null);
 
-    /// <summary>
-    /// If an instance of instanceType exist then it will return that instance otherwise it will create a new one based off mappings.
-    /// </summary>
-    /// <param name="instanceType">The type of instance to resolve</param>
-    /// <param name="requireInstance">Will cause an exception if an instance hasn't been registered</param>
-    /// <returns>The/An instance of 'instanceType'</returns>
-    object Resolve(Type instanceType, bool requireInstance = false);
-    /// <summary>
-    /// Injects everything that is registered at once
-    /// </summary>
-    void InjectAll();
-    /// <summary>
-    /// Register a named instance
-    /// </summary>
-    /// <param name="name">The name for the instance to be resolved.</param>
-    /// <param name="instance">The instance that will be resolved be the name</param>
-    /// <param name="injectNow">Perform the injection immediately</param>
-    void RegisterInstance(string name, object instance, bool injectNow = true);
+        void RegisterRelation<TFor, TBase, TConcrete>();
 
-    /// <summary>
-    /// Resolve by the name
-    /// </summary>
-    /// <typeparam name="T"></typeparam>
-    /// <param name="name"></param>
-    /// <returns></returns>
-    T Resolve<T>(string name) where T : class;
+        /// <summary>
+        /// Register an instance of a type.
+        /// </summary>
+        /// <typeparam name="TBase"></typeparam>
+        /// <param name="default"></param>
+        /// <param name="injectNow"></param>
+        /// <returns></returns>
+        void RegisterInstance<TBase>(TBase @default, bool injectNow) where TBase : class;
+
+        /// <summary>
+        /// Register an instance of a type.
+        /// </summary>
+        /// <param name="type"></param>
+        /// <param name="default"></param>
+        /// <param name="injectNow"></param>
+        /// <returns></returns>
+        void RegisterInstance(Type type, object @default, bool injectNow);
+
+        /// <summary>
+        /// Register a named instance
+        /// </summary>
+        /// <param name="baseType">The type to register the instance for.</param>
+        /// <param name="name">The name for the instance to be resolved.</param>
+        /// <param name="instance">The instance that will be resolved be the name</param>
+        /// <param name="injectNow">Perform the injection immediately</param>
+        void RegisterInstance(Type baseType, object instance = null, string name = null, bool injectNow = true);
+
+        void RegisterInstance<TBase>(TBase instance, string name, bool injectNow = true) where TBase : class;
+
+        void RegisterInstance<TBase>(TBase instance) where TBase : class;
+
+        /// <summary>
+        ///  If an instance of T exist then it will return that instance otherwise it will create a new one based off mappings.
+        /// </summary>
+        /// <typeparam name="T">The type of instance to resolve</typeparam>
+        /// <returns>The/An instance of 'instanceType'</returns>
+        T Resolve<T>(string name = null, bool requireInstance = false) where T : class;
+
+        /// <summary>
+        /// If an instance of instanceType exist then it will return that instance otherwise it will create a new one based off mappings.
+        /// </summary>
+        /// <param name="baseType">The type of instance to resolve</param>
+        /// <param name="name">The type of instance to resolve</param>
+        /// <param name="requireInstance">If true will return null if an instance isn't registered.</param>
+        /// <returns>The/An instance of 'instanceType'</returns>
+        object Resolve(Type baseType, string name = null, bool requireInstance = false);
+
+        TBase ResolveRelation<TBase>(Type tfor);
+
+        TBase ResolveRelation<TFor, TBase>();
+
+        /// <summary>
+        /// Resolves all instances of TType or subclasses of TType.  Either named or not.
+        /// </summary>
+        /// <typeparam name="TType">The Type to resolve</typeparam>
+        /// <returns>List of objects.</returns>
+        IEnumerable<TType> ResolveAll<TType>();
+
+        //IEnumerable<object> ResolveAll(Type type);
+        void Register(Type source, Type target, string name = null);
+
+        /// <summary>
+        /// Resolves all instances of TType or subclasses of TType.  Either named or not.
+        /// </summary>
+        /// <typeparam name="TType">The Type to resolve</typeparam>
+        /// <returns>List of objects.</returns>
+        IEnumerable<object> ResolveAll(Type type);
+    }
+
+#if DLL
 }
+
+#endif

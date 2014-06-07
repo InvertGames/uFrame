@@ -1,0 +1,12 @@
+C:\Invert\uFrame\Tests\bin\Debug\Tests.dll
+C:\Invert\uFrame\Tests\bin\Debug\Tests.pdb
+C:\Invert\uFrame\Tests\bin\Debug\Assembly-CSharp.dll
+C:\Invert\uFrame\Tests\bin\Debug\UnityEngine.dll
+C:\Invert\uFrame\Tests\bin\Debug\UnityEditor.dll
+C:\Invert\uFrame\Tests\bin\Debug\Assembly-CSharp.pdb
+C:\Invert\uFrame\Tests\bin\Debug\UnityEngine.xml
+C:\Invert\uFrame\Tests\bin\Debug\UnityEditor.xml
+C:\Invert\uFrame\Tests\obj\Debug\Tests.csprojResolveAssemblyReference.cache
+C:\Invert\uFrame\Tests\obj\Debug\Tests.dll
+C:\Invert\uFrame\Tests\obj\Debug\Tests.pdb
+C:\Invert\uFrame\Tests\bin\Debug\Assembly-CSharp.xml

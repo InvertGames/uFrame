@@ -12,7 +12,7 @@ public interface IDiagramItem : ISelectable,IDiagramSubItem
     Vector2 Location { get; set; }
     string AssemblyQualifiedName { get; }
     bool Dirty { get; set; }
-    void Rename(IElementsDataRepository repository, string newName);
+    void Rename(string newName);
     void RemoveFromDiagram();
     Rect HeaderPosition { get; set; } 
     ElementDesignerData Data { get; set; }
@@ -21,11 +21,11 @@ public interface IDiagramItem : ISelectable,IDiagramSubItem
     
 
     void BeginEditing();
-    void EndEditing(IElementsDataRepository repository);
+    void EndEditing();
 }
 
 public interface IRefactorable
 {
     List<Refactorer> Refactorings { get;  }
-    void Applied();
+    void RefactorApplied();
 }

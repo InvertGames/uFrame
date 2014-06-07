@@ -1,15 +1,20 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Invert.uFrame;
+using Invert.uFrame.Editor;
+using Invert.uFrame.Editor.ElementDesigner;
 using UnityEditor;
 using UnityEngine;
+
 #if DEBUG
 namespace System.Runtime.CompilerServices
 {
     public class ExtensionAttribute : Attribute { }
 }
 #endif
-public class ElementsDesigner : EditorWindow
+
+public class ElementsDesigner : EditorWindow, ICommandHandler
 {
     private static float HEIGHT = 768;
 
@@ -17,10 +22,24 @@ public class ElementsDesigner : EditorWindow
 
     private static float WIDTH = 1024;
 
+    public ICommandUI Toolbar
+    {
+        get
+        {
+            if (_toolbar != null) return _toolbar;
+
+
+            return _toolbar = uFrameEditor.CreateCommandUI<ToolbarUI>(this, typeof(IToolbarCommand));
+        }
+        set { _toolbar = value; }
+    }
+
     [SerializeField]
     private ElementsDiagram _diagram;
 
     private Vector2 _scrollPosition;
+    private ICommandUI _toolbar;
+
 
     public static ElementDesignerData SelectedElementDiagram
     {
@@ -30,7 +49,11 @@ public class ElementsDesigner : EditorWindow
     public ElementsDiagram Diagram
     {
         get { return _diagram; }
-        set { _diagram = value; }
+        set
+        {
+            _diagram = value;
+            _toolbar = null;
+        }
     }
 
     public float InspectorWidth
@@ -134,7 +157,8 @@ public class ElementsDesigner : EditorWindow
             Mathf.RoundToInt(32),
             Mathf.RoundToInt(32));
         GUILayout.BeginHorizontal(EditorStyles.toolbar);
-        DoToolbar(diagramRect);
+        //DoToolbar(diagramRect);
+        DoToolbar2();
         GUILayout.EndHorizontal();
 
         GUI.Box(diagramRect, string.Empty, style);
@@ -223,6 +247,13 @@ public class ElementsDesigner : EditorWindow
         Diagram.DeselectAll();
     }
 
+    public virtual void OpenDiagramByAttribute(Type type)
+    {
+        var attribute = type.GetCustomAttributes(typeof(DiagramInfoAttribute), true).FirstOrDefault() as DiagramInfoAttribute;
+        if (attribute == null) return;
+        LoadDiagramByName(attribute.DiagramName);
+    }
+
     public void Update()
     {
         if (Diagram == null) return;
@@ -249,15 +280,6 @@ public class ElementsDesigner : EditorWindow
         }
     }
 
-    private void DiagramOnAddNewBehaviourClicked(ElementData data)
-    {
-        var behaviour = UBAssetManager.CreateAsset<UFrameBehaviours>(Diagram.Repository.AssetPath, data.Name + "Behaviour");
-        behaviour.ViewModelType = data.CurrentViewModelType;
-        EditorUtility.SetDirty(behaviour);
-        data.Dirty = true;
-        Selection.activeObject = behaviour;
-    }
-
     private void DiagramOnSelectionChanged(IDiagramItem diagramItem, IDiagramItem item)
     {
         var behaviourItem = Diagram.SelectedItem as BehaviourSubItem;
@@ -267,101 +289,13 @@ public class ElementsDesigner : EditorWindow
         }
     }
 
-    private void DoToolbar(Rect diagramRect)
+    private void DoToolbar2()
     {
-        if (
-            GUILayout.Button(
-                new GUIContent(Diagram == null || Diagram.Data == null ? "--Select Diagram--" : Diagram.Data.name),
-                EditorStyles.toolbarPopup))
+        if (GUILayout.Button(new GUIContent(Diagram == null || Diagram.Data == null ? "--Select Diagram--" : Diagram.Data.name),EditorStyles.toolbarPopup))
         {
             SelectDiagram();
         }
-        if (Diagram != null && Diagram.Data != null)
-        {
-            if (GUILayout.Button(new GUIContent("Scene Flow"), EditorStyles.toolbarButton))
-            {
-                Diagram.Data.PopToFilter(Diagram.Data.SceneFlowFilter);
-                Diagram.Refresh(true);
-            }
-
-            foreach (var filter in Diagram.Data.FilterPath)
-            {
-                if (GUILayout.Button(new GUIContent(filter.Name), EditorStyles.toolbarButton))
-                {
-                    Diagram.Data.PopToFilter(filter);
-                    Diagram.Refresh(true);
-                }
-            }
-        }
-
-        //if (Diagram != null && Diagram.Data != null && Diagram.Data.FilterPath.Any())
-        //{
-        //    if (GUILayout.Button(Diagram.Data.CurrentFilter.Name, EditorStyles.toolbarDropDown))
-        //    {
-        //        SelectFilter(filter);
-        //    }
-        //}
-
-        GUILayout.FlexibleSpace();
-        if (Diagram != null)
-        {
-            var scale = GUILayout.HorizontalSlider(UFStyles.Scale, 0.55f, 1f, GUILayout.Width(200f));
-            if (scale != UFStyles.Scale)
-            {
-               
-                UFStyles.Scale = scale;
-
-                Diagram.Refresh();
-                //var diagramSize = Diagram.DiagramSize;
-                //var scrollMax = new Vector2(diagramSize.width - diagramRect.width,
-                //    diagramSize.height - diagramRect.height);
-                //_scrollPosition = scrollMax / 2;
-            
-            }
-            if (GUILayout.Button("Add New", EditorStyles.toolbarButton))
-            {
-                Diagram.ShowAddNewContextMenu(false);
-            }
-            if (GUILayout.Button("Save", EditorStyles.toolbarButton))
-            {
-                Diagram.DeselectAll();
-                Diagram.Repository.Save();
-            }
-        }
-        if (Diagram != null)
-            if (GUILayout.Button("Auto Layout", EditorStyles.toolbarButton))
-            {
-                Diagram.LayoutDiagram();
-            }
-        if (Diagram != null)
-            if (GUILayout.Button("Import", EditorStyles.toolbarButton))
-            {
-                var typesList = ActionSheetHelpers.GetDerivedTypes<ViewModel>(false, false).ToList();
-                typesList.AddRange(ActionSheetHelpers.GetDerivedTypes<Enum>(false, false));
-                typesList.AddRange(ActionSheetHelpers.GetDerivedTypes<SceneManager>(false, false));
-                typesList.AddRange(ActionSheetHelpers.GetDerivedTypes<ViewBase>(false, false));
-
-                ImportTypeListWindow.InitTypeListWindow("Choose Type", typesList, (item) =>
-                {
-                    if (Diagram.Repository.IsImportOnly(item))
-                    {
-                        EditorUtility.DisplayDialog("Can't do that", string.Format("Can't import {0} because it already belongs to another diagram.", item.FullName), "OK");
-
-                        return;
-                    }
-
-                    var result = Diagram.Repository.ImportType(item);
-                    if (result != null)
-                    {
-                        result.Data = Diagram.Data;
-                        if (Diagram.Data.CurrentFilter.IsAllowed(result, item))
-                        {
-                            Diagram.Data.CurrentFilter.Locations[result] = new Vector2(15f, 15f);
-                        }
-                    }
-                    Diagram.Refresh(true);
-                });
-            }
+        Toolbar.Go();
     }
 
     private void HandlePanning(Rect diagramRect)
@@ -394,22 +328,25 @@ public class ElementsDesigner : EditorWindow
         }
     }
 
-    private void LoadDiagram(ElementDesignerData diagram)
+    private void LoadDiagram(string path)
     {
-        Diagram = new ElementsDiagram(new ElementsDataRepository()
-        {
-            Diagram = diagram
-        });
+        Diagram = uFrameEditor.Container.Resolve<ElementsDiagram>();
+        Diagram = new ElementsDiagram(path);
         Diagram.SelectionChanged += DiagramOnSelectionChanged;
-        Diagram.AddNewBehaviourClicked += DiagramOnAddNewBehaviourClicked;
-        
-        LastLoadedDiagram = diagram.name;
+        LastLoadedDiagram = path;
 
         Diagram.Data.ApplyFilter();
         Diagram.Refresh(true);
-        Selection.activeObject = diagram;
+
         // var newScrollPosition = new Vector2(Diagram.DiagramSize.width, Diagram.DiagramSize.height).normalized / 2;
         //_scrollPosition = new Vector2(250,250);
+    }
+
+    private void LoadDiagramByName(string diagramName)
+    {
+        var diagram = UFrameAssetManager.Diagrams.FirstOrDefault(p => p.Name == diagramName);
+        if (diagram == null) return;
+        LoadDiagram(diagram);
     }
 
     private void SelectDiagram()
@@ -425,6 +362,7 @@ public class ElementsDesigner : EditorWindow
             {
                 LastLoadedDiagram = diagramName;
                 LoadDiagram(diagram);
+                Selection.activeObject = diagram;
             });
         }
         menu.ShowAsContext();
@@ -446,4 +384,25 @@ public class ElementsDesigner : EditorWindow
         }
         menu.ShowAsContext();
     }
+
+    public void Execute(IEditorCommand command)
+    {
+        this.ExecuteCommand(command);
+        Diagram.Refresh();
+        Repaint();
+    }
+
+    public IEnumerable<object> ContextObjects
+    {
+        get
+        {
+            yield return this;
+            if (Diagram != null)
+                yield return Diagram;
+            if (Diagram != null && Diagram.Data != null)
+                yield return Diagram.Data;
+        }
+    }
 }
+
+

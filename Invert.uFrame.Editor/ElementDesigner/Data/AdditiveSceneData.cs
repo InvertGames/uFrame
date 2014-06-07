@@ -53,7 +53,7 @@ public class AdditiveSceneData : IDiagramSubItem
         
     }
 
-    public void Rename(IElementsDataRepository repository, IDiagramItem data, string name)
+    public void Rename( IDiagramItem data, string name)
     {
         Name = name;
     }

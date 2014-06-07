@@ -15,9 +15,9 @@ public class EnumData : DiagramItem
         set { _enumItems = value; }
     }
 
-    public override void EndEditing(IElementsDataRepository repository)
+    public override void EndEditing()
     {
-        base.EndEditing(repository);
+        base.EndEditing();
         foreach (var item in Data.ViewModels.SelectMany(p => p.Properties).Where(p => p.RelatedTypeName == OldName))
         {
             item.RelatedType = AssemblyQualifiedName;

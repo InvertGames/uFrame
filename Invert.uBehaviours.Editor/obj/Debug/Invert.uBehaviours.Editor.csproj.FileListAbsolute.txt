@@ -1,0 +1,11 @@
+D:\Invert\Git\uFrame\Invert.uBehaviours.Editor\bin\Debug\Invert.uBehaviours.Editor.dll
+D:\Invert\Git\uFrame\Invert.uBehaviours.Editor\bin\Debug\Invert.uBehaviours.Editor.pdb
+D:\Invert\Git\uFrame\Invert.uBehaviours.Editor\bin\Debug\Invert.uBehaviours.dll
+D:\Invert\Git\uFrame\Invert.uBehaviours.Editor\bin\Debug\UnityEditor.dll
+D:\Invert\Git\uFrame\Invert.uBehaviours.Editor\bin\Debug\UnityEngine.dll
+D:\Invert\Git\uFrame\Invert.uBehaviours.Editor\bin\Debug\Invert.uBehaviours.pdb
+D:\Invert\Git\uFrame\Invert.uBehaviours.Editor\bin\Debug\UnityEditor.xml
+D:\Invert\Git\uFrame\Invert.uBehaviours.Editor\bin\Debug\UnityEngine.xml
+D:\Invert\Git\uFrame\Invert.uBehaviours.Editor\obj\Debug\Invert.uBehaviours.Editor.csprojResolveAssemblyReference.cache
+D:\Invert\Git\uFrame\Invert.uBehaviours.Editor\obj\Debug\Invert.uBehaviours.Editor.dll
+D:\Invert\Git\uFrame\Invert.uBehaviours.Editor\obj\Debug\Invert.uBehaviours.Editor.pdb

@@ -276,8 +276,6 @@ public partial class FPSWeaponViewModel : ViewModel {
     
     public readonly P<System.Int32> _BurstSizeProperty = new P<int>();
     
-    public readonly P<System.Single> _SpreadProperty = new P<float>();
-    
     public readonly P<System.Single> _RecoilSpeedProperty = new P<float>();
     
     public readonly P<System.Single> _FireSpeedProperty = new P<float>();
@@ -293,6 +291,8 @@ public partial class FPSWeaponViewModel : ViewModel {
     private ICommand _Reload;
     
     private ICommand _EndFire;
+    
+    private ICommand _BulletFired;
     
     public virtual int Ammo {
         get {
@@ -375,15 +375,6 @@ public partial class FPSWeaponViewModel : ViewModel {
         }
     }
     
-    public virtual float Spread {
-        get {
-            return _SpreadProperty.Value;
-        }
-        set {
-            _SpreadProperty.Value = value;
-        }
-    }
-    
     public virtual float RecoilSpeed {
         get {
             return _RecoilSpeedProperty.Value;
@@ -453,6 +444,15 @@ public partial class FPSWeaponViewModel : ViewModel {
         }
         set {
             _EndFire = value;
+        }
+    }
+    
+    public virtual ICommand BulletFired {
+        get {
+            return _BulletFired;
+        }
+        set {
+            _BulletFired = value;
         }
     }
 }

@@ -89,7 +89,7 @@ public class SceneManagerTransition : IDiagramSubItem
         //    SceneManagerData.Transitions.Remove(this);
     }
 
-    public void Rename(IElementsDataRepository repository, IDiagramItem data, string name)
+    public void Rename(IDiagramItem data, string name)
     {
         Name = name;
     }

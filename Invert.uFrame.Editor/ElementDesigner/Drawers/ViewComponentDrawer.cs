@@ -15,6 +15,10 @@ public class ViewComponentDrawer : DiagramItemDrawer<ViewComponentData>
         }
     }
 
+    public ViewComponentDrawer()
+    {
+    }
+
     public ViewComponentDrawer(ViewComponentData data, ElementsDiagram diagram)
         : base(data, diagram)
     {

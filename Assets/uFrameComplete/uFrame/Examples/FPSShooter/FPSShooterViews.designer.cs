@@ -105,8 +105,8 @@ public abstract class FPSDamageableViewBase : ViewBase {
     public virtual void ExecuteApplyDamage(int arg) {
         this.ExecuteCommand(FPSDamageable.ApplyDamage, arg);
     }
-    
-    protected override void InitializeViewModel(ViewModel viewModel) {
+
+    public override void InitializeViewModel(ViewModel viewModel) {
         FPSDamageableViewModel fPSDamageable = ((FPSDamageableViewModel)(viewModel));
         fPSDamageable.Health = this._Health;
         fPSDamageable.State = this._State;
@@ -172,8 +172,8 @@ public abstract class FPSEnemyViewBase : FPSDamageableViewBase {
     public override ViewModel CreateModel() {
         return this.RequestViewModel(GameManager.Container.Resolve<FPSEnemyController>());
     }
-    
-    protected override void InitializeViewModel(ViewModel viewModel) {
+
+    public override void InitializeViewModel(ViewModel viewModel) {
         base.InitializeViewModel(viewModel);
         FPSEnemyViewModel fPSEnemy = ((FPSEnemyViewModel)(viewModel));
         fPSEnemy.Speed = this._Speed;
@@ -390,8 +390,8 @@ public abstract class FPSGameViewBase : ViewBase {
     public virtual void ExecuteQuitGame() {
         this.ExecuteCommand(FPSGame.QuitGame);
     }
-    
-    protected override void InitializeViewModel(ViewModel viewModel) {
+
+    public override void InitializeViewModel(ViewModel viewModel) {
         FPSGameViewModel fPSGame = ((FPSGameViewModel)(viewModel));
         fPSGame.CurrentPlayer = this._CurrentPlayer == null ? null : this._CurrentPlayer.ViewModelObject as FPSPlayerViewModel;
         fPSGame.State = this._State;
@@ -517,8 +517,8 @@ public abstract class FPSPlayerViewBase : FPSDamageableViewBase {
     public virtual void ExecuteSelectWeapon(int arg) {
         this.ExecuteCommand(FPSPlayer.SelectWeapon, arg);
     }
-    
-    protected override void InitializeViewModel(ViewModel viewModel) {
+
+    public override void InitializeViewModel(ViewModel viewModel) {
         base.InitializeViewModel(viewModel);
         FPSPlayerViewModel fPSPlayer = ((FPSPlayerViewModel)(viewModel));
         fPSPlayer.CurrentWeaponIndex = this._CurrentWeaponIndex;
@@ -623,16 +623,6 @@ public abstract class FPSWeaponViewBase : ViewBase {
     [UFRequireInstanceMethod("GetBurstSizeTwoWayValue")]
     public bool _BurstSizeIsTwoWay;
     
-    [UFToggleGroup("Spread")]
-    [UnityEngine.HideInInspector()]
-    [UFRequireInstanceMethod("SpreadChanged")]
-    public bool _BindSpread;
-    
-    [UFGroup("Spread")]
-    [UnityEngine.HideInInspector()]
-    [UFRequireInstanceMethod("GetSpreadTwoWayValue")]
-    public bool _SpreadIsTwoWay;
-    
     [UFToggleGroup("RecoilSpeed")]
     [UnityEngine.HideInInspector()]
     [UFRequireInstanceMethod("RecoilSpeedChanged")]
@@ -708,10 +698,6 @@ public abstract class FPSWeaponViewBase : ViewBase {
     [UFGroup("View Model Properties")]
     [UnityEngine.HideInInspector()]
     public int _BurstSize;
-    
-    [UFGroup("View Model Properties")]
-    [UnityEngine.HideInInspector()]
-    public float _Spread;
     
     [UFGroup("View Model Properties")]
     [UnityEngine.HideInInspector()]
@@ -831,13 +817,6 @@ public abstract class FPSWeaponViewBase : ViewBase {
         throw new System.NotImplementedException();
     }
     
-    public virtual void SpreadChanged(float value) {
-    }
-    
-    public virtual float GetSpreadTwoWayValue() {
-        throw new System.NotImplementedException();
-    }
-    
     public virtual void RecoilSpeedChanged(float value) {
     }
     
@@ -939,14 +918,6 @@ public abstract class FPSWeaponViewBase : ViewBase {
                 this.BindProperty(()=>FPSWeapon._BurstSizeProperty, this.BurstSizeChanged);
             }
         }
-        if (this._BindSpread) {
-            if (this._SpreadIsTwoWay) {
-                this.BindProperty(()=>FPSWeapon._SpreadProperty, this.SpreadChanged, this.GetSpreadTwoWayValue);
-            }
-            else {
-                this.BindProperty(()=>FPSWeapon._SpreadProperty, this.SpreadChanged);
-            }
-        }
         if (this._BindRecoilSpeed) {
             if (this._RecoilSpeedIsTwoWay) {
                 this.BindProperty(()=>FPSWeapon._RecoilSpeedProperty, this.RecoilSpeedChanged, this.GetRecoilSpeedTwoWayValue);
@@ -1001,7 +972,11 @@ public abstract class FPSWeaponViewBase : ViewBase {
         this.ExecuteCommand(FPSWeapon.EndFire);
     }
     
-    protected override void InitializeViewModel(ViewModel viewModel) {
+    public virtual void ExecuteBulletFired() {
+        this.ExecuteCommand(FPSWeapon.BulletFired);
+    }
+
+    public override void InitializeViewModel(ViewModel viewModel) {
         FPSWeaponViewModel fPSWeapon = ((FPSWeaponViewModel)(viewModel));
         fPSWeapon.Ammo = this._Ammo;
         fPSWeapon.State = this._State;
@@ -1012,7 +987,6 @@ public abstract class FPSWeaponViewBase : ViewBase {
         fPSWeapon.RoundSize = this._RoundSize;
         fPSWeapon.MinSpread = this._MinSpread;
         fPSWeapon.BurstSize = this._BurstSize;
-        fPSWeapon.Spread = this._Spread;
         fPSWeapon.RecoilSpeed = this._RecoilSpeed;
         fPSWeapon.FireSpeed = this._FireSpeed;
         fPSWeapon.BurstSpeed = this._BurstSpeed;
@@ -1137,8 +1111,8 @@ public abstract class WavesFPSGameViewBase : FPSGameViewBase {
     public override ViewModel CreateModel() {
         return this.RequestViewModel(GameManager.Container.Resolve<WavesFPSGameController>());
     }
-    
-    protected override void InitializeViewModel(ViewModel viewModel) {
+
+    public override void InitializeViewModel(ViewModel viewModel) {
         base.InitializeViewModel(viewModel);
         WavesFPSGameViewModel wavesFPSGame = ((WavesFPSGameViewModel)(viewModel));
         wavesFPSGame.KillsToNextWave = this._KillsToNextWave;
@@ -1180,8 +1154,8 @@ public abstract class FPSMenuViewBase : ViewBase {
     public virtual void ExecutePlay() {
         this.ExecuteCommand(FPSMenu.Play);
     }
-    
-    protected override void InitializeViewModel(ViewModel viewModel) {
+
+    public override void InitializeViewModel(ViewModel viewModel) {
     }
 }
 
@@ -1215,8 +1189,8 @@ public abstract class DeathMatchGameViewBase : FPSGameViewBase {
     public override ViewModel CreateModel() {
         return this.RequestViewModel(GameManager.Container.Resolve<DeathMatchGameController>());
     }
-    
-    protected override void InitializeViewModel(ViewModel viewModel) {
+
+    public override void InitializeViewModel(ViewModel viewModel) {
         base.InitializeViewModel(viewModel);
     }
 }
@@ -1242,9 +1216,6 @@ public partial class FPSHUDView : FPSGameViewBase {
 public partial class FPSEnemyView : FPSEnemyViewBase {
 }
 
-public partial class NewView1 : FPSWeaponView {
-}
-
 public partial class FPSMainMenuView : FPSMenuViewBase {
 }
 
@@ -1255,6 +1226,26 @@ public partial class FPSWeaponFire : ViewComponent {
             return ((FPSWeaponViewModel)(this.View.ViewModelObject));
         }
     }
+    
+    public virtual void ExecuteBeginFire() {
+        this.View.ExecuteCommand(FPSWeapon.BeginFire);
+    }
+    
+    public virtual void ExecuteNextZoom() {
+        this.View.ExecuteCommand(FPSWeapon.NextZoom);
+    }
+    
+    public virtual void ExecuteReload() {
+        this.View.ExecuteCommand(FPSWeapon.Reload);
+    }
+    
+    public virtual void ExecuteEndFire() {
+        this.View.ExecuteCommand(FPSWeapon.EndFire);
+    }
+    
+    public virtual void ExecuteBulletFired() {
+        this.View.ExecuteCommand(FPSWeapon.BulletFired);
+    }
 }
 
 public partial class FPSCrosshair : ViewComponent {
@@ -1263,6 +1254,26 @@ public partial class FPSCrosshair : ViewComponent {
         get {
             return ((FPSWeaponViewModel)(this.View.ViewModelObject));
         }
+    }
+    
+    public virtual void ExecuteBeginFire() {
+        this.View.ExecuteCommand(FPSWeapon.BeginFire);
+    }
+    
+    public virtual void ExecuteNextZoom() {
+        this.View.ExecuteCommand(FPSWeapon.NextZoom);
+    }
+    
+    public virtual void ExecuteReload() {
+        this.View.ExecuteCommand(FPSWeapon.Reload);
+    }
+    
+    public virtual void ExecuteEndFire() {
+        this.View.ExecuteCommand(FPSWeapon.EndFire);
+    }
+    
+    public virtual void ExecuteBulletFired() {
+        this.View.ExecuteCommand(FPSWeapon.BulletFired);
     }
 }
 

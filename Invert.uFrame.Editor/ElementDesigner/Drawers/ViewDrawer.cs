@@ -1,10 +1,17 @@
 using System.Collections.Generic;
 using System.Linq;
+using Invert.uFrame;
+using Invert.uFrame.Editor.ElementDesigner;
+using UnityEditor;
 using UnityEngine;
 
 public class ViewDrawer : DiagramItemDrawer<ViewData>
 {
     private ElementDataBase _forElement;
+
+    public ViewDrawer()
+    {
+    }
 
     public override GUIStyle BackgroundStyle
     {
@@ -14,6 +21,7 @@ public class ViewDrawer : DiagramItemDrawer<ViewData>
             return UFStyles.DiagramBox2;
         }
     }
+
     public ViewDrawer(ViewData data, ElementsDiagram diagram)
         : base(data, diagram)
     {
@@ -31,19 +39,6 @@ public class ViewDrawer : DiagramItemDrawer<ViewData>
 
     protected override IEnumerable<DiagramSubItemGroup> GetItemGroups()
     {
-
-        //var vm = Data.ViewForElement;
-        //UFrameBehaviours[] items = new UFrameBehaviours[] { };
-        //if (vm != null)
-        //{
-        //    items =  UBAssetManager.Behaviours.OfType<UFrameBehaviours>()
-        //        .Where(p => p != null && p.ViewModelTypeString == vm.ViewModelAssemblyQualifiedName).ToArray();    
-        //}
-        //yield return new DiagramSubItemGroup()
-        //{
-        //    Header = BehavioursHeader,
-        //    Items = Data.Items.ToArray()
-        //};
         yield break;
     }
 
@@ -51,54 +46,34 @@ public class ViewDrawer : DiagramItemDrawer<ViewData>
     {
         get { return UFStyles.Item4; }
     }
+    [Inject("ViewDoubleClick")]
+    public IEditorCommand DoubleClickCommand { get; set; }
 
-    //public DiagramItemHeader BehavioursHeader
-    //{
-    //    get
-    //    {
-    //        if (_behavioursHeader != null)
-    //            return _behavioursHeader;
+    public override void DoubleClicked()
+    {
+        base.DoubleClicked();
+       
+    }
 
+    public override float HeaderSize
+    {
+        get { return base.HeaderSize + 6; }
+    }
 
-    //        _behavioursHeader =
-    //            new DiagramItemHeader() { HeaderType = typeof(UBSharedBehaviour), Label = "Behaviours" };
-    //        _behavioursHeader.OnAddItem += BehavioursHeaderOnOnAddItem;
-    //        return _behavioursHeader;
-    //    }
-    //    set { _behavioursHeader = value; }
-    //}
+    protected override void DrawHeader(ElementsDiagram diagram, bool importOnly)
+    {
+        base.DrawHeader(diagram, importOnly);
+        var subTitlePosition = Data.HeaderPosition;
+        subTitlePosition.y += 15;
+        var style = new GUIStyle(EditorStyles.miniLabel);
+        style.alignment = TextAnchor.MiddleCenter;
+        GUI.Label(subTitlePosition,Data.BaseViewName,style);
+    }
 
-    //private void BehavioursHeaderOnOnAddItem()
-    //{
-    //    Diagram.Repository.CreateUBehaviour(Data);
-    //    Diagram.Refresh();
-    //    //    var asset = UBAssetManager.CreateAsset<UFrameBehaviours>(Diagram.Repository.ViewsPath, Data.Name + "Behaviour");
-    //    //    asset.ViewModelTypeString = Data.ViewForElement.ViewModelAssemblyQualifiedName;
-    //    //   
-    //}
-
-    //protected override void DrawItem(IDiagramSubItem item, ElementsDiagram diagram, bool importOnly)
-    //{
-    //    base.DrawItem(item, diagram, importOnly);
-    //    var valueItem = item as BehaviourSubItem;
-    //    GUILayout.BeginArea(item.Position);
-    //    //GUILayout.BeginHorizontal();
-
-    //    //GUILayout.Label(item.Name,ItemStyle,GUILayout.Width(Data.Position.width / 2f));
-
-    //    var type = valueItem.Property.Type;
-    //    if (type == typeof (string))
-    //    {
-    //        valueItem.StringValue = EditorGUILayout.TextField(valueItem.Name, valueItem.StringValue);
-    //    }
-    //    else
-    //    {
-    //        EditorGUILayout.LabelField(valueItem.Name, "Not implemented", ItemStyle);
-    //    }
-
-    //    //GUILayout.EndHorizontal(); 
-    //    GUILayout.EndArea();
-    //}
+    protected override void DrawContent(ElementsDiagram diagram, bool importOnly)
+    {
+        base.DrawContent(diagram, importOnly);
+    }
 
     protected override void DrawSelectedItem(IDiagramSubItem item, ElementsDiagram diagram)
     {

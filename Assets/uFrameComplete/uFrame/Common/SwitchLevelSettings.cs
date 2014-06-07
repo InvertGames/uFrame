@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using UnityEngine;
 
 public class SwitchLevelSettings<T> : ISwitchLevelSettings where T : SceneManager

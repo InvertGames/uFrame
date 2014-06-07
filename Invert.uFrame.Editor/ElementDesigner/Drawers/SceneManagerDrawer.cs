@@ -10,6 +10,9 @@ public class SceneManagerDrawer : DiagramItemDrawer<SceneManagerData>
     //{
     //    get { return 15; }
     //}
+    public SceneManagerDrawer()
+    {
+    }
 
     public override GUIStyle BackgroundStyle
     {

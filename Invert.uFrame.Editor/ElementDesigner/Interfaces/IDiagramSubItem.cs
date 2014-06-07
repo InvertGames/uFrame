@@ -8,7 +8,7 @@ public interface IDiagramSubItem : ISelectable
     string Identifier { get; }
     bool IsSelectable { get;}
     void Remove(IDiagramItem data);
-    void Rename(IElementsDataRepository repository, IDiagramItem data, string name);
+    void Rename(IDiagramItem data, string name);
 
 
 }

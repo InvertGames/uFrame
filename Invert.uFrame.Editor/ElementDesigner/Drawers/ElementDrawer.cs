@@ -4,15 +4,18 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.Remoting.Messaging;
+using Invert.uFrame;
+using Invert.uFrame.Editor;
+using Invert.uFrame.Editor.ElementDesigner;
+using Invert.uFrame.Editor.ElementDesigner.Commands;
 using UnityEditor;
 using UnityEngine;
 
 public class ElementDrawer : DiagramItemDrawer<ElementDataBase>
 {
-    //public float Height
-    //{
-    //    get { return (Data.EnumItems.Sum(p=>p.Position.height)) + (HeaderSize * 4) + (Padding * 2); }
-    //}
+    public ElementDrawer()
+    {
+    }
 
     public override GUIStyle BackgroundStyle
     {
@@ -29,50 +32,64 @@ public class ElementDrawer : DiagramItemDrawer<ElementDataBase>
     {
     }
 
-    public DiagramItemHeader ComponentsHeader
-    {
-        get { return _componentsHeader ?? (_componentsHeader = new DiagramItemHeader() { HeaderType = typeof(ViewComponentData), Label = "Components" }); }
-        set { _componentsHeader = value; }
-    }
 
-    public DiagramItemHeader ViewsHeader
-    {
-        get { return _viewsHeader ?? (_viewsHeader = new DiagramItemHeader() { HeaderType = typeof(ViewData), Label = "Views" }); }
-        set { _viewsHeader = value; }
-    }
 
     public DiagramItemHeader PropertiesHeader
     {
-        get { return _propertiesHeader; }
+        get
+        {
+            if (_propertiesHeader == null)
+            {
+                _propertiesHeader = Container.Resolve<DiagramItemHeader>();
+
+                _propertiesHeader.Label = "Properties";
+                _propertiesHeader.HeaderType = typeof (ViewModelPropertyData);
+                _propertiesHeader.AddCommand = Container.Resolve<AddElementPropertyCommand>();
+            }
+            return _propertiesHeader;
+        }
         set { _propertiesHeader = value; }
     }
 
     public DiagramItemHeader CollectionsHeader
     {
-        get { return _collectionsHeader; }
+        get
+        {
+            
+             if (_collectionsHeader == null)
+            {
+                _collectionsHeader = Container.Resolve<DiagramItemHeader>();
+                _collectionsHeader.Label = "Collections";
+                _collectionsHeader.HeaderType = typeof (ViewModelCollectionData);
+                _collectionsHeader.AddCommand = Container.Resolve<IEditorCommand>("AddElementCollection");
+            }
+            return _collectionsHeader;
+        }
         set { _collectionsHeader = value; }
     }
 
     public DiagramItemHeader CommandsHeader
     {
-        get { return _commandsHeader; }
+        get
+        {
+            if (_commandsHeader == null)
+            {
+                _commandsHeader = Container.Resolve<DiagramItemHeader>();
+                _commandsHeader.Label = "Commands";
+                _commandsHeader.HeaderType = typeof(ViewModelCommandData);
+                _commandsHeader.AddCommand = Container.Resolve<AddElementCommandCommand>();
+            }
+            return _commandsHeader;
+        }
         set { _commandsHeader = value; }
     }
 
-    public DiagramItemHeader BehavioursHeader
-    {
-        get { return _behavioursHeader; }
-        set { _behavioursHeader = value; }
-    }
 
-    private DiagramItemHeader _propertiesHeader = new DiagramItemHeader() { Label = "Properties", HeaderType = typeof(ViewModelPropertyData) };
-    private DiagramItemHeader _collectionsHeader = new DiagramItemHeader() { Label = "Collections", HeaderType = typeof(ViewModelCollectionData) };
-    private DiagramItemHeader _commandsHeader = new DiagramItemHeader() { Label = "Commands", HeaderType = typeof(ViewModelCommandData) };
-    private DiagramItemHeader _behavioursHeader = new DiagramItemHeader() { Label = "Behaviours" };
-    
-    private DiagramItemHeader _componentsHeader;
-    private DiagramItemHeader _viewsHeader;
+    private DiagramItemHeader _propertiesHeader;
+    private DiagramItemHeader _collectionsHeader;
+    private DiagramItemHeader _commandsHeader;
 
+    private float _width;
 
     protected override GUIStyle GetHighlighter()
     {
@@ -88,50 +105,61 @@ public class ElementDrawer : DiagramItemDrawer<ElementDataBase>
         get
         {
 
-            return Math.Max(EditorStyles.largeLabel.CalcSize(new GUIContent(Data.FullLabel)).x + 50, MaxNameWidth(EditorStyles.label)+MaxTypeWidth(EditorStyles.label));
+            return Math.Max(110 * Scale, _width);
         }
     }
+
+    public override void CalculateBounds()
+    {
+        base.CalculateBounds();
+        _maxNameWidth = MaxNameWidth(EditorStyles.label);
+        _maxTypeWidth = MaxTypeWidth(EditorStyles.label);
+
+
+        _width = Math.Max(EditorStyles.largeLabel.CalcSize(new GUIContent(Data.FullLabel)).x + 50, _maxNameWidth + _maxTypeWidth);
+    }
+
+    private float _maxTypeWidth;
+    private float _maxNameWidth;
+
     public virtual float MaxTypeWidth(GUIStyle style)
     {
-     
-            var maxLengthItem = Vector2.zero;
-            if (AllowCollapsing && !Data.IsCollapsed)
+        var maxLengthItem = Vector2.zero;
+        if (AllowCollapsing && !Data.IsCollapsed)
+        {
+            foreach (var item in Data.ViewModelItems)
             {
-                foreach (var item in Data.ViewModelItems)
-                {
-                    var newSize = style.CalcSize(new GUIContent(item.RelatedTypeName));
+                var newSize = style.CalcSize(new GUIContent(item.RelatedTypeName));
 
-                    if (maxLengthItem.x < newSize.x)
-                    {
-                        maxLengthItem = newSize;
-                    }
+                if (maxLengthItem.x < newSize.x)
+                {
+                    maxLengthItem = newSize;
                 }
             }
+        }
+        return maxLengthItem.x + 2;
 
-
-            return maxLengthItem.x + 5;
-      
     }
     public float MaxNameWidth(GUIStyle style)
     {
-     
-            var maxLengthItem = Vector2.zero;
-            if (AllowCollapsing && !Data.IsCollapsed)
+        style.fontStyle= FontStyle.Bold;
+        var maxLengthItem = Vector2.zero;
+        if (AllowCollapsing && !Data.IsCollapsed)
+        {
+            foreach (var item in Data.ViewModelItems)
             {
-                foreach (var item in Data.ViewModelItems)
-                {
-                    var newSize = style.CalcSize(new GUIContent(item.Name));
+                var newSize = style.CalcSize(new GUIContent(item.Name));
 
-                    if (maxLengthItem.x < newSize.x)
-                    {
-                        maxLengthItem = newSize;
-                    }
+                if (maxLengthItem.x < newSize.x)
+                {
+                    maxLengthItem = newSize;
                 }
             }
+        }
 
 
-            return  maxLengthItem.x + 2;
-        
+        return maxLengthItem.x + 2;
+
     }
     protected override void DrawSelectedItem(IDiagramSubItem subItem, ElementsDiagram diagram)
     {
@@ -150,15 +178,19 @@ public class ElementDrawer : DiagramItemDrawer<ElementDataBase>
         }
         if (GUILayout.Button(rtn, UFStyles.ClearItemStyle))
         {
-            var typesList = item.GetAvailableRelatedTypes(Diagram.Repository);
-            ElementItemTypesWindow.InitTypeListWindow("Choose Type", typesList.ToArray(), (selected) =>
+            var commandName = item.GetType().Name.Replace("Data", "") + "TypeSelection";
+            var command = Container.Resolve<IEditorCommand>(commandName);
+            if (command == null)
             {
-                Undo.RecordObject(diagram.Data, "Set Type");
-                item.RelatedType = selected.AssemblyQualifiedName;
-                diagram.Data.UpdateLinks();
-                EditorUtility.SetDirty(diagram.Data);
-                EditorWindow.GetWindow<ElementItemTypesWindow>().Close();
-            });
+                Debug.Log("Type selection command not found for " + commandName);
+            }
+            else
+            {
+                Execute(command);
+            }
+         
+
+         
         }
         base.DrawSelectedItem(subItem, diagram);
     }
@@ -177,7 +209,7 @@ public class ElementDrawer : DiagramItemDrawer<ElementDataBase>
             GUILayout.Space(7);
 
             var style = new GUIStyle(UFStyles.ClearItemStyle);
-           // style.fontSize = Mathf.RoundToInt(style.fontSize * Scale);
+            // style.fontSize = Mathf.RoundToInt(style.fontSize * Scale);
             style.fontStyle = FontStyle.Normal;
             style.alignment = TextAnchor.MiddleLeft;
             style.normal.textColor = BackgroundStyle.normal.textColor;
@@ -186,10 +218,10 @@ public class ElementDrawer : DiagramItemDrawer<ElementDataBase>
             {
                 rtn = ElementDataBase.TypeNameAliases[rtn];
             }
-            GUILayout.Label(rtn, style, GUILayout.Width(MaxTypeWidth(ItemStyle)));
+            GUILayout.Label(rtn, style, GUILayout.Width(_maxTypeWidth * Scale));
             style.fontStyle = FontStyle.Bold;
             style.alignment = TextAnchor.MiddleLeft;
-            GUILayout.Label(vmItem.Name, style, GUILayout.Width(MaxNameWidth(ItemStyle)));
+            GUILayout.Label(vmItem.Name, style, GUILayout.Width(_maxNameWidth * Scale));
             GUILayout.EndHorizontal();
             GUILayout.EndArea();
         }
@@ -212,8 +244,8 @@ public class ElementDrawer : DiagramItemDrawer<ElementDataBase>
             //    Header = ComponentsHeader,
             //    Items = elementData.IncludedComponents.Cast<IDiagramSubItem>().ToArray()
             //};
-          
-     
+
+
         }
         yield return new DiagramSubItemGroup()
         {

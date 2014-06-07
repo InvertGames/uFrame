@@ -44,6 +44,12 @@ public static class UFStyles
     private static GUIStyle _titleBarStyle;
     private static GUIStyle _addButtonStyle;
     private static GUIStyle _clearItemStyle;
+    private static GUIStyle _sceneViewBar;
+    private static GUIStyle _eyeBall;
+    private static GUIStyle _navigatePreviousStyle;
+    private static GUIStyle _navigateNextStyle;
+    private static GUIStyle _viewBarTitleStyle;
+    private static GUIStyle _viewBarSubTitleStyle;
 
     public static string SkinName
     {
@@ -51,15 +57,22 @@ public static class UFStyles
         //EditorGUIUtility.isProSkin ? "ProSkin" : "FreeSkin"; }
     }
 
+    private static float _scale = 0.0f;
+
     public static float Scale
     {
         get
         {
-            return EditorPrefs.GetFloat("ElementDesigner_Scale", 1f);
+            if (_scale == 0.0f)
+            {
+                return _scale = EditorPrefs.GetFloat("ElementDesigner_Scale", 1f);
+            }
+            return _scale;
         }
         set
         {
             EditorPrefs.SetFloat("ElementDesigner_Scale",value);
+            _scale = value;
             foreach (var field in typeof(UFStyles).GetFields(BindingFlags.Static | BindingFlags.NonPublic))
             {
                 if (field.FieldType == typeof(GUIStyle))
@@ -84,6 +97,38 @@ public static class UFStyles
             return _addButtonStyle;
         }
     }
+    public static GUIStyle ViewBarTitleStyle
+    {
+        get
+        {
+            if (_viewBarTitleStyle == null)
+                _viewBarTitleStyle = new GUIStyle
+                {
+                    normal = { textColor = new Color(0.95f, 0.95f, 9.95f) },
+                    alignment = TextAnchor.MiddleRight,
+                    fontSize = 16,
+                    fontStyle = FontStyle.Bold
+                    //fontStyle = FontStyle.Bold
+                };
+            return _viewBarTitleStyle;
+        }
+    }
+    public static GUIStyle ViewBarSubTitleStyle
+    {
+        get
+        {
+            if (_viewBarSubTitleStyle == null)
+                _viewBarSubTitleStyle = new GUIStyle
+                {
+                    normal = {  textColor = new Color(0.7f, 0.7f, 0.7f) },
+                    alignment = TextAnchor.MiddleCenter,
+                    fontSize = 10,
+//                    fontStyle = FontStyle.Bold
+                    //fontStyle = FontStyle.Bold
+                };
+            return _viewBarSubTitleStyle;
+        }
+    }
     public static GUIStyle TitleBarStyle
     {
         get
@@ -103,6 +148,8 @@ public static class UFStyles
             return _titleBarStyle;
         }
     }
+
+
     public static Texture2D GetSkinTexture(string name)
     {
         return Resources.Load<Texture2D>(string.Format("{0}/{1}", SkinName, name));
@@ -157,6 +204,26 @@ public static class UFStyles
             return _arrowDownButtonStyle;
         }
     }
+    public static GUIStyle SceneViewBar
+    {
+        get
+        {
+            //if (_diagramBox1 == null)
+            _sceneViewBar = new GUIStyle
+            {
+                normal = { background = GetSkinTexture("SceneViewBar"), textColor = new Color(0.3f, 0.3f, 0.3f) },
+
+                stretchHeight = true,
+                stretchWidth = true,
+                // border = new RectOffset(44, 50, 20, 34),
+                padding = new RectOffset(7, 7, 7, 7)
+            };
+
+            return _sceneViewBar;
+        }
+    }
+
+  
     public static GUIStyle DiagramBox1
     {
         get
@@ -668,7 +735,117 @@ public static class UFStyles
             //return _itemStyle;
         }
     }
-
+    public static GUIStyle EyeBall
+    {
+        get
+        {
+            if (_eyeBall == null)
+            {
+                var textColor = EditorGUIUtility.isProSkin ? new Color(0.8f, 0.8f, 0.8f) : Color.black;
+                _eyeBall = new GUIStyle
+                {
+                    normal =
+                    {
+                        background = GetSkinTexture("EyeBall"),
+                        textColor = textColor
+                    },
+                    focused =
+                    {
+                        background = GetSkinTexture("EyeBall"),
+                        textColor = textColor
+                    },
+                    active = { background = GetSkinTexture("EyeBall2"), textColor = textColor },
+                    hover = { background = GetSkinTexture("EyeBall"), textColor = textColor },
+                    onHover =
+                    {
+                        background = GetSkinTexture("EyeBall"),
+                        textColor = textColor
+                    },
+                    onFocused = { background = GetSkinTexture("EyeBall2"), textColor = textColor },
+                    onNormal = { background = GetSkinTexture("EyeBall2"), textColor = textColor },
+                    onActive = { background = GetSkinTexture("EyeBall2"), textColor = textColor },
+                    fixedHeight = 48,
+                    fixedWidth = 36,
+                    alignment = TextAnchor.MiddleCenter,
+                };
+            }
+            return _eyeBall;
+        }
+    }
+    public static GUIStyle NavigatePreviousStyle
+    {
+        get
+        {
+            if (_navigatePreviousStyle == null)
+            {
+                var textColor = EditorGUIUtility.isProSkin ? new Color(0.8f, 0.8f, 0.8f) : Color.black;
+                _navigatePreviousStyle = new GUIStyle
+                {
+                    normal =
+                    {
+                        background = GetSkinTexture("NavigatePrevious"),
+                        textColor = textColor
+                    },
+                    focused =
+                    {
+                        background = GetSkinTexture("NavigatePrevious2"),
+                        textColor = textColor
+                    },
+                    active = { background = GetSkinTexture("NavigatePrevious"), textColor = textColor },
+                    hover = { background = GetSkinTexture("NavigatePrevious2"), textColor = textColor },
+                    onHover =
+                    {
+                        background = GetSkinTexture("NavigatePrevious"),
+                        textColor = textColor
+                    },
+                    onFocused = { background = GetSkinTexture("NavigatePrevious2"), textColor = textColor },
+                    onNormal = { background = GetSkinTexture("NavigatePrevious"), textColor = textColor },
+                    onActive = { background = GetSkinTexture("NavigatePrevious"), textColor = textColor },
+                    fixedHeight = 48,
+                    fixedWidth = 36,
+                    alignment = TextAnchor.MiddleCenter,
+                };
+            }
+            return _navigatePreviousStyle;
+        }
+    }
+    public static GUIStyle NavigateNextStyle
+    {
+        get
+        {
+            if (_navigateNextStyle == null)
+            {
+                var textColor = EditorGUIUtility.isProSkin ? new Color(0.8f, 0.8f, 0.8f) : Color.black;
+                _navigateNextStyle = new GUIStyle
+                {
+                    normal =
+                    {
+                        background = GetSkinTexture("NavigateNext"),
+                        textColor = textColor
+                    },
+                    focused =
+                    {
+                        background = GetSkinTexture("NavigateNext2"),
+                        textColor = textColor
+                    },
+                    active = { background = GetSkinTexture("NavigateNext"), textColor = textColor },
+                    hover = { background = GetSkinTexture("NavigateNext2"), textColor = textColor },
+                    onHover =
+                    {
+                        background = GetSkinTexture("NavigateNext"),
+                        textColor = textColor
+                    },
+                    onFocused = { background = GetSkinTexture("NavigateNext2"), textColor = textColor },
+                    onNormal = { background = GetSkinTexture("NavigateNext"), textColor = textColor },
+                    onActive = { background = GetSkinTexture("NavigateNext2"), textColor = textColor },
+                    fixedHeight = 48,
+                    fixedWidth = 36,
+                    alignment = TextAnchor.MiddleCenter,
+                };
+            }
+            return _navigateNextStyle;
+        }
+    }
     public static GUIStyle ButtonStyle
     {
         get

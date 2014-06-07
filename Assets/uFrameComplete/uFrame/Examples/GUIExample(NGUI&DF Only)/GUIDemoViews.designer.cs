@@ -76,8 +76,8 @@ public abstract class GUIMainMenuScreenViewBase : ViewBase {
     public virtual void ExecuteRandomName() {
         this.ExecuteCommand(GUIMainMenuScreen.RandomName);
     }
-    
-    protected override void InitializeViewModel(ViewModel viewModel) {
+
+    public override void InitializeViewModel(ViewModel viewModel) {
         GUIMainMenuScreenViewModel gUIMainMenuScreen = ((GUIMainMenuScreenViewModel)(viewModel));
         gUIMainMenuScreen.PlayerName = this._PlayerName;
     }
@@ -160,8 +160,8 @@ public abstract class GUIMainMenuViewBase : ViewBase {
     public virtual void ExecutePlay() {
         this.ExecuteCommand(GUIMainMenu.Play);
     }
-    
-    protected override void InitializeViewModel(ViewModel viewModel) {
+
+    public override void InitializeViewModel(ViewModel viewModel) {
         GUIMainMenuViewModel gUIMainMenu = ((GUIMainMenuViewModel)(viewModel));
         gUIMainMenu.MainMenuScreen = this._MainMenuScreen == null ? null : this._MainMenuScreen.ViewModelObject as GUIMainMenuScreenViewModel;
     }
@@ -229,8 +229,8 @@ public abstract class GUIGameViewBase : ViewBase {
     public virtual void ExecuteQuitGame() {
         this.ExecuteCommand(GUIGame.QuitGame);
     }
-    
-    protected override void InitializeViewModel(ViewModel viewModel) {
+
+    public override void InitializeViewModel(ViewModel viewModel) {
         GUIGameViewModel gUIGame = ((GUIGameViewModel)(viewModel));
         gUIGame.CurrentPlayerName = this._CurrentPlayerName;
     }

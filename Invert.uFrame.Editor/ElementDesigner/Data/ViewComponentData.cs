@@ -155,9 +155,9 @@ public class ViewComponentData : DiagramItem
         get { return Type.GetType(AssemblyQualifiedName); }
     }
 
-    public override void EndEditing(IElementsDataRepository repository)
+    public override void EndEditing()
     {
-        base.EndEditing(repository);
+        base.EndEditing();
     }
 
     public override void RemoveFromDiagram()

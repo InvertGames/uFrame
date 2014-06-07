@@ -39,23 +39,23 @@ namespace Invert.uFrame.Editor.Refactoring
         }
         public override void Process(RefactorContext context)
         {
-            Name.Process(context);
-            NameAsChangedMethod.Process(context);
-            NameAsTwoWayMethod.Process(context);
-            FieldName.Process(context);
-            ViewFieldName.Process(context);
-            NameAsPrefabBindingOption.Process(context);
-            NameAsTwoWayBindingOption.Process(context);
+            //Name.Process(context);
+            //NameAsChangedMethod.Process(context);
+            //NameAsTwoWayMethod.Process(context);
+            //FieldName.Process(context);
+            //ViewFieldName.Process(context);
+            //NameAsPrefabBindingOption.Process(context);
+            //NameAsTwoWayBindingOption.Process(context);
         }
         public override void PostProcess(RefactorContext context)
         {
-            Name.PostProcess(context);
-            NameAsChangedMethod.PostProcess(context);
-            NameAsTwoWayMethod.PostProcess(context);
-            FieldName.PostProcess(context);
-            ViewFieldName.PostProcess(context);
-            NameAsPrefabBindingOption.PostProcess(context);
-            NameAsTwoWayBindingOption.PostProcess(context);
+            //Name.PostProcess(context);
+            //NameAsChangedMethod.PostProcess(context);
+            //NameAsTwoWayMethod.PostProcess(context);
+            //FieldName.PostProcess(context);
+            //ViewFieldName.PostProcess(context);
+            //NameAsPrefabBindingOption.PostProcess(context);
+            //NameAsTwoWayBindingOption.PostProcess(context);
         }
     }
 }

@@ -47,10 +47,10 @@
     </Reference>
     <Reference Include="System.Xml.Linq" />
     <Reference Include="AssetStoreTools">
-      <HintPath>Assets\PrivateStuff\AssetStoreTools\Editor\AssetStoreTools.dll</HintPath>
+      <HintPath>Assets\AssetStoreTools\Editor\AssetStoreTools.dll</HintPath>
     </Reference>
     <Reference Include="AssetStoreToolsExtra">
-      <HintPath>Assets\PrivateStuff\AssetStoreTools\Editor\AssetStoreToolsExtra.dll</HintPath>
+      <HintPath>Assets\AssetStoreTools\Editor\AssetStoreToolsExtra.dll</HintPath>
     </Reference>
     <Reference Include="dfScriptLite">
       <HintPath>Assets\PrivateStuff\Daikon Forge\DataBinding\Plugins\dfScriptLite.dll</HintPath>
@@ -229,8 +229,8 @@
     <None Include="Assets\XmlDocs\Assembly-CSharp.XML" />
     <None Include="Assets\XmlDocs\UBehaviours.XML" />
     <None Include="Assets\XmlDocs\UnityEngine.xml" />
-    <None Include="Assets\PrivateStuff\AssetStoreTools\Editor\AssetStoreTools.dll" />
-    <None Include="Assets\PrivateStuff\AssetStoreTools\Editor\AssetStoreToolsExtra.dll" />
+    <None Include="Assets\AssetStoreTools\Editor\AssetStoreTools.dll" />
+    <None Include="Assets\AssetStoreTools\Editor\AssetStoreToolsExtra.dll" />
     <None Include="Assets\PrivateStuff\Photon Unity Networking\Editor\PhotonNetwork\Newtonsoft.Json.dll" />
     <None Include="Assets\PrivateStuff\PlayMaker\Editor\de\PlayMakerEditor.de.resources.dll" />
     <None Include="Assets\PrivateStuff\PlayMaker\Editor\es-ES\PlayMakerEditor.es-ES.resources.dll" />
@@ -252,11 +252,11 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Assets" />
+    <Folder Include="Assets\AssetStoreTools" />
+    <Folder Include="Assets\AssetStoreTools\Editor" />
     <Folder Include="Assets\PrivateStuff" />
     <Folder Include="Assets\PrivateStuff\AssetStoreStuff" />
     <Folder Include="Assets\PrivateStuff\AssetStoreStuff\StoreImages" />
-    <Folder Include="Assets\PrivateStuff\AssetStoreTools" />
-    <Folder Include="Assets\PrivateStuff\AssetStoreTools\Editor" />
     <Folder Include="Assets\PrivateStuff\Daikon Forge" />
     <Folder Include="Assets\PrivateStuff\Daikon Forge\DFGUI" />
     <Folder Include="Assets\PrivateStuff\Daikon Forge\DFGUI\Shaders" />

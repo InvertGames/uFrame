@@ -266,9 +266,9 @@ public abstract class ElementDataBase : DiagramItem, ISubSystemType
 
     public string OldAssemblyName { get; set; }
 
-    public override void EndEditing(IElementsDataRepository repository)
+    public override void EndEditing()
     {
-        base.EndEditing(repository);
+        base.EndEditing();
         var newText = Name;
 
         if (Data.ViewModels.Count(p => p.Name == newText || p.Name == OldName) > 1)

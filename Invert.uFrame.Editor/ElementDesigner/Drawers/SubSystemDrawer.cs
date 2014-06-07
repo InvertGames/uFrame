@@ -15,6 +15,10 @@ public class SubSystemDrawer : DiagramItemDrawer<SubSystemData>
         }
     }
 
+    public SubSystemDrawer()
+    {
+    }
+
     public SubSystemDrawer(SubSystemData data, ElementsDiagram diagram)
         : base(data, diagram)
     {

@@ -1,4 +1,4 @@
-﻿
+
 
 public interface IJsonSerializable
 {

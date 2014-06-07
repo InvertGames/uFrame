@@ -1,3 +1,6 @@
+using Invert.uFrame.Editor;
+using Invert.uFrame.Editor.ElementDesigner;
+using Invert.uFrame.Editor.ElementDesigner.Commands;
 using Invert.uFrame.Editor.ElementDesigner.Data;
 using System;
 using System.Collections.Generic;
@@ -7,7 +10,7 @@ using System.Reflection;
 using UnityEditor;
 using UnityEngine;
 
-public class ElementsDiagram
+public class ElementsDiagram : ICommandHandler
 {
     public delegate void SelectionChangedEventArgs(IDiagramItem oldData, IDiagramItem newData);
 
@@ -29,15 +32,7 @@ public class ElementsDiagram
 
     private SerializedObject _serializedObject;
     private Event _currentEvent;
-
-    public static DiagramPlugin[] Plugins
-    {
-        get
-        {
-            return _plugins ?? (_plugins = GetDerivedTypes<DiagramPlugin>(false, false).Select(p => Activator.CreateInstance(p) as DiagramPlugin).ToArray());
-        }
-        set { _plugins = value; }
-    }
+    private SerializedObject _o;
 
     public IEnumerable<IDiagramItem> AllSelected
     {
@@ -141,6 +136,7 @@ public class ElementsDiagram
     {
         get { return UFStyles.Scale; }
     }
+
     public IElementDrawer MouseOverViewData
     {
         get
@@ -150,7 +146,7 @@ public class ElementsDiagram
         }
     }
 
-    public IElementsDataRepository Repository { get; set; }
+    protected IElementsDataRepository Repository { get; set; }
 
     public IDiagramItem SelectedData
     {
@@ -160,6 +156,7 @@ public class ElementsDiagram
             return Selected.Model;
         }
     }
+    
     public IElementDrawer Selected
     {
         get { return _selected; }
@@ -182,7 +179,7 @@ public class ElementsDiagram
 
             if (old != value && value != null)
             {
-                
+
                 OnSelectionChanged(old == null ? null : old.Model, value.Model);
             }
         }
@@ -216,243 +213,111 @@ public class ElementsDiagram
 
     public Rect SelectionRect { get; set; }
 
-    public ElementsDiagram(IElementsDataRepository repository)
+    private SerializedObject SerializedObject
     {
-        Repository = repository;
-        Data = repository.GetData();
+        get { return _o ?? (_o = new SerializedObject(Data)); }
+        set { _o = value; }
     }
 
-    public static IEnumerable<Type> GetDerivedTypes<T>(bool includeAbstract = false, bool includeBase = true)
+    public ElementsDiagram(string assetPath)
     {
-        var type = typeof(T);
-        if (includeBase)
-            yield return type;
-        if (includeAbstract)
+        var fileExtension = Path.GetExtension(assetPath);
+        Repository = uFrameEditor.Container.Resolve<IElementsDataRepository>(fileExtension);
+        if (Repository != null)
         {
-            foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
-            {
-                foreach (var t in assembly
-                .GetTypes()
-                .Where(x => x.IsSubclassOf(type)))
-                {
-                    yield return t;
-                }
-            }
+            Repository.LoadDiagram(assetPath);
         }
         else
         {
-            foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
-            {
-                foreach (var t in assembly
-                    .GetTypes()
-                    .Where(x => x.IsSubclassOf(type) && !x.IsAbstract))
-                {
-                    yield return t;
-                }
-            }
+            throw new Exception(
+                string.Format("The asset with the extension {0} could not be loaded.  Do you have the plugin installed?",
+                fileExtension
+                ));
         }
+
+        Data = Repository.LoadDiagram(assetPath);
+        
+
+        CodePathStrategy = uFrameEditor.Container.Resolve<ICodePathStrategy>(Data.CodePathStrategyName ?? "Default");
+        CodePathStrategy.AssetPath = assetPath.Replace(string.Format("{0}{1}", Path.GetFileNameWithoutExtension(assetPath), fileExtension), ""); 
     }
 
-    public static DiagramPlugin GetPlugin(PluginData data)
-    {
-        return Plugins.FirstOrDefault(p => p.GetType() == data.PluginType);
-    }
+    
 
-    public void AddNewEnum(bool addAtMousePosition)
+    public ICodePathStrategy CodePathStrategy { get; set; }
+
+    public void ExecuteCommand(IEditorCommand command,object arg)
     {
-        Undo.RecordObject(Data, "Add New Enum");
-        var data = new EnumData()
-        {
-            Data = Data,
-            Name = GetUniqueName("NewEnum"),
-            Location = new Vector2(15, 15)
-        };
-        Data.Enums.Add(data);
-        if (addAtMousePosition)
-        {
-            data.Location = LastMouseDownPosition;
-        }
+        Undo.RecordObject(Data, command.Title);
+        command.Execute(arg);
         Refresh(true);
         EditorUtility.SetDirty(Data);
-    }
-
-    public void AddNewPluginItem(IDiagramPlugin plugin, string name)
-    {
-        Undo.RecordObject(Data, "Add " + name);
-        var data = new PluginData()
-        {
-            Data = Data,
-            PluginType = plugin.GetType(),
-            Name = GetUniqueName(name),
-            Location = new Vector2(15, 15)
-        };
-        Data.PluginItems.Add(data);
-        data.Location = LastMouseDownPosition;
-        Refresh(true);
-        EditorUtility.SetDirty(Data);
-    }
-
-    public void AddNewSceneManager(bool addAtMousePosition)
-    {
-        Undo.RecordObject(Data, "Add New SceneManager");
-        var data = new SceneManagerData()
-        {
-            Data = Data,
-            Name = GetUniqueName("NewSceneManager"),
-            Location = new Vector2(15, 15)
-        };
-        Data.SceneManagers.Add(data);
-        if (addAtMousePosition)
-        {
-            data.Location = LastMouseDownPosition;
-        }
-        Refresh(true);
-        EditorUtility.SetDirty(Data);
-    }
-
-    public void AddNewSubDiagram(bool addAtMousePosition)
-    {
-        Undo.RecordObject(Data, "Add New Sub System");
-        var data = new SubSystemData()
-        {
-            Data = Data,
-            Name = GetUniqueName("New Sub System"),
-            Location = new Vector2(15, 15)
-        };
-        Data.SubSystems.Add(data);
-        if (addAtMousePosition)
-        {
-            data.Location = LastMouseDownPosition;
-        }
-        Refresh(true);
-        EditorUtility.SetDirty(Data);
-    }
-
-    public void AddNewView(bool addAtMousePosition)
-    {
-        Undo.RecordObject(Data, "Add New Definition");
-        var data = new ViewData()
-        {
-            Data = Data,
-            Name = GetUniqueName("NewView"),
-            Location = new Vector2(15, 15)
-        };
-        Data.Views.Add(data);
-        if (addAtMousePosition)
-        {
-            data.Location = LastMouseDownPosition;
-        }
-        Refresh(true);
-        EditorUtility.SetDirty(Data);
-    }
-
-    public void AddNewViewComponent(bool addAtMousePosition)
-    {
-        Undo.RecordObject(Data, "Add New View Component");
-        var data = new ViewComponentData()
-        {
-            Data = Data,
-            Name = GetUniqueName("NewViewComponent"),
-            Location = new Vector2(15, 15)
-        };
-        Data.ViewComponents.Add(data);
-        if (addAtMousePosition)
-        {
-            data.Location = LastMouseDownPosition;
-        }
-        Refresh(true);
-        EditorUtility.SetDirty(Data);
-    }
-
-    public void AddNewViewModel(ElementData data)
-    {
-        Undo.RecordObject(Data, "Add Element");
-        Data.ViewModels.Add(data);
-        Refresh(true);
-        EditorUtility.SetDirty(Data);
-    }
-
-    public void AddNewViewModel(bool addAtMousePosition)
-    {
-        var data = new ElementData
-        {
-            Data = Data,
-            Name = GetUniqueName("NewElement"),
-            //BaseTypeName = typeof(ViewModel).FullName,
-            Dirty = true
-        };
-
-        if (addAtMousePosition)
-        {
-            data.Location = LastMouseDownPosition;
-        }
-        data.Filter.Locations[data] = data.Location;
-        AddNewViewModel(data);
     }
 
     public IElementDrawer CreateDrawerFor(IDiagramItem item)
     {
-        foreach (var diagramPlugin in Plugins)
-        {
-            var drawer = diagramPlugin.GetDrawer(this,item);
-            if (drawer != null)
-            {
-                return drawer;
-            }
-        }
-        var type = item.GetType();
-        var elementData = item as ElementDataBase;
-        if (elementData != null)
-        {
-            var drawer = new ElementDrawer(elementData, this);
+        return uFrameEditor.CreateDrawer(item, this);
+        //foreach (var diagramPlugin in Plugins)
+        //{
+        //    var drawer = diagramPlugin.GetDrawer(this, item);
+        //    if (drawer != null)
+        //    {
+        //        return drawer;
+        //    }
+        //}
+        //var type = item.GetType();
+        //var elementData = item as ElementDataBase;
+        //if (elementData != null)
+        //{
+        //    var drawer = new ElementDrawer(elementData, this);
 
-            var data = elementData as ElementData;
-            if (data != null)
-            {
-                drawer.PropertiesHeader.OnAddItem += () => AddNewProperty(data);
-                drawer.CollectionsHeader.OnAddItem += () => AddNewCollection(data);
-                drawer.CommandsHeader.OnAddItem += () => AddNewCommand(data);
-                drawer.BehavioursHeader.OnAddItem += () => AddNewBehaviour(data);
-            }
-            return drawer;
-        }
-        if (type == typeof(EnumData))
-        {
-            return new DiagramEnumDrawer(item as EnumData, this);
-        }
-        if (type == typeof(ViewComponentData))
-        {
-            return new ViewComponentDrawer(item as ViewComponentData, this);
-        }
-        if (type == typeof(SubSystemData))
-        {
-            return new SubSystemDrawer(item as SubSystemData, this);
-        }
-        if (type == typeof(ViewData))
-        {
-            return new ViewDrawer(item as ViewData, this);
-        }
-        if (type == typeof(SceneManagerData))
-        {
-            return new SceneManagerDrawer(item as SceneManagerData, this);
-        }
-        if (type == typeof(EnumData))
-        {
-            return new DiagramEnumDrawer(item as EnumData, this);
-        }
-        if (type == typeof(PluginData))
-        {
-            var data = item as PluginData;
-            if (data == null) return null;
-            foreach (var diagramPlugin in Plugins)
-            {
-                if (diagramPlugin.GetType() == data.PluginType)
-                {
-                    return diagramPlugin.GetDrawer(this, data);
-                }
-            }
-        }
-        return null;
+        //    var data = elementData as ElementData;
+        //    if (data != null)
+        //    {
+        //        drawer.PropertiesHeader.OnAddItem += () => AddNewProperty(data);
+        //        drawer.CollectionsHeader.OnAddItem += () => AddNewCollection(data);
+        //        drawer.CommandsHeader.OnAddItem += () => AddNewCommand(data);
+        //        drawer.BehavioursHeader.OnAddItem += () => AddNewBehaviour(data);
+        //    }
+        //    return drawer;
+        //}
+        //if (type == typeof(EnumData))
+        //{
+        //    return new DiagramEnumDrawer(item as EnumData, this);
+        //}
+        //if (type == typeof(ViewComponentData))
+        //{
+        //    return new ViewComponentDrawer(item as ViewComponentData, this);
+        //}
+        //if (type == typeof(SubSystemData))
+        //{
+        //    return new SubSystemDrawer(item as SubSystemData, this);
+        //}
+        //if (type == typeof(ViewData))
+        //{
+        //    return new ViewDrawer(item as ViewData, this);
+        //}
+        //if (type == typeof(SceneManagerData))
+        //{
+        //    return new SceneManagerDrawer(item as SceneManagerData, this);
+        //}
+        //if (type == typeof(EnumData))
+        //{
+        //    return new DiagramEnumDrawer(item as EnumData, this);
+        //}
+        //if (type == typeof(PluginData))
+        //{
+        //    var data = item as PluginData;
+        //    if (data == null) return null;
+        //    foreach (var diagramPlugin in Plugins)
+        //    {
+        //        if (diagramPlugin.GetType() == data.PluginType)
+        //        {
+        //            return diagramPlugin.GetDrawer(this, data);
+        //        }
+        //    }
+        //}
+        //return null;
     }
 
     public void DeselectAll()
@@ -461,7 +326,7 @@ public class ElementsDiagram
         {
             if (diagramItem.IsEditing)
             {
-                diagramItem.EndEditing(Repository);
+                diagramItem.EndEditing();
             }
             diagramItem.IsSelected = false;
         }
@@ -471,10 +336,17 @@ public class ElementsDiagram
     {
         get { return CurrentEvent.mousePosition; }
     }
+
     public float SnapSize
     {
-        get { return Data.SnapSize*Scale; }
+        get { return Data.SnapSize * Scale; }
     }
+
+    public void Save()
+    {
+        Repository.SaveDiagram(Data);
+    }
+
     public void Draw()
     {
         //var beforeScale = GUI.matrix;
@@ -482,8 +354,8 @@ public class ElementsDiagram
         //var guiScale = Matrix4x4.Scale(new Vector3(0.75f, 0.75f, 0.75f));
         //GUI.matrix = guiTranslation * guiScale * guiTranslation.inverse;
 
-        Repository.SerializedObject.Update();
-
+        //Repository.FastUpdate();
+        SerializedObject.Update();
         string focusItem = null;
 
         foreach (var drawer in ElementDrawers.OrderBy(p => p.IsSelected).ToArray())
@@ -506,8 +378,8 @@ public class ElementsDiagram
         {
             EditorGUI.FocusTextInControl(focusItem);
         }
-
-        Repository.SerializedObject.ApplyModifiedProperties();
+        SerializedObject.ApplyModifiedProperties();
+        //Repository.FastSave();
         if (!EditorApplication.isCompiling)
         {
             HandleInput();
@@ -523,16 +395,16 @@ public class ElementsDiagram
             var newPosition = DragDelta;//CurrentMousePosition - SelectionOffset;
             foreach (var diagramItem in AllSelected)
             {
-                diagramItem.Location += (newPosition * (1f/Scale));
-                
+                diagramItem.Location += (newPosition * (1f / Scale));
+
                 //diagramItem.Location = new Vector2(Mathf.Round((diagramItem.Location.x)/ SnapSize) * SnapSize, Mathf.Round(diagramItem.Location.y / SnapSize) * SnapSize);
-              
+
                 //var newPositionRect = new Rect(newPosition.x, newPosition.y, diagramItem.Position.width,
                 //    diagramItem.Position.height);
                 ////Math.Round(value / 5.0) * 5
                 //diagramItem.Position = newPositionRect;
             }
-            
+
             foreach (var viewModelDrawer in ElementDrawers)
             {
                 viewModelDrawer.CalculateBounds();
@@ -573,7 +445,7 @@ public class ElementsDiagram
                     {
                         Debug.Log(ex.Message);
                     }
-                 
+
                 }
             }
             else
@@ -630,8 +502,6 @@ public class ElementsDiagram
             }
             UFStyles.DrawExpandableBox(SelectionRect, UFStyles.BoxHighlighter4, string.Empty);
         }
-
-        //GUI.matrix = beforeScale;
     }
 
     public DiagramItemDrawer<TData> GetDrawer<TData>(TData data) where TData : IDiagramItem
@@ -639,24 +509,12 @@ public class ElementsDiagram
         return ElementDrawers.OfType<DiagramItemDrawer<TData>>().FirstOrDefault(p => p.Data.Equals(data));
     }
 
-    public string GetUniqueName(string name)
-    {
-        var tempName = name;
-        var index = 1;
-        while (Data.AllDiagramItems.Any(p => p.Name.ToUpper() == tempName.ToUpper()))
-        {
-            tempName = name + index;
-            index++;
-        }
-        return tempName;
-    }
-
     public void HandleInput()
     {
 
         var e = Event.current;
 
-        if (e.type == EventType.MouseDown)
+        if (e.type == EventType.MouseDown && e.button == 0)
         {
             CurrentEvent = Event.current;
             LastMouseDownPosition = e.mousePosition;
@@ -668,7 +526,7 @@ public class ElementsDiagram
             }
             e.Use();
         }
-        if (CurrentEvent.rawType == EventType.MouseUp && IsMouseDown)
+        if (CurrentEvent.rawType == EventType.MouseUp && IsMouseDown && e.button == 0)
         {
             LastMouseUpPosition = e.mousePosition;
             IsMouseDown = false;
@@ -679,7 +537,7 @@ public class ElementsDiagram
         {
             if (SelectedData != null && SelectedData.IsEditing)
             {
-                SelectedData.EndEditing(Repository);
+                SelectedData.EndEditing();
                 e.Use();
                 this.Dirty = true;
             }
@@ -694,25 +552,11 @@ public class ElementsDiagram
         }
     }
 
-    public void LayoutDiagram()
-    {
-        Undo.RecordObject(Data, "Layout Diagram");
-        var x = 0f;
-        var y = 20f;
-        foreach (var viewModelData in Data.DiagramItems)
-        {
-            viewModelData.Location = new Vector2(x, y);
-            x += viewModelData.Position.width + 10f;
-            //y += viewModelData.Position.height + 10f;
-        }
-        Refresh(true);
-        EditorUtility.SetDirty(Data);
-    }
-
     public void Refresh(bool refreshDrawers = true)
     {
         if (refreshDrawers)
             ElementDrawers.Clear();
+
         foreach (var diagramItem in Data.DiagramItems)
         {
             diagramItem.Data = Data;
@@ -730,128 +574,141 @@ public class ElementsDiagram
         Dirty = true;
     }
 
-    public void RemoveItem(IViewModelItem item)
-    {
-    }
-
     public void ShowAddNewContextMenu(bool addAtMousePosition = false)
     {
-        var menu = new GenericMenu();
+        var menu = uFrameEditor.CreateCommandUI<ContextMenuUI>(this, typeof(IDiagramContextCommand));
+        menu.Go();
 
-        if (Data.CurrentFilter.IsAllowed(null, typeof(ElementData)))
-            menu.AddItem(new GUIContent("New Element"), false, () => { AddNewViewModel(addAtMousePosition); });
+        //var menu = new GenericMenu();
+        //var contextCommands = uFrameEditor.GetContextCommandsFor<ElementsDiagram>();
+        //foreach (var contextCommand in contextCommands)
+        //{
+        //    IEditorCommand command = contextCommand;
+        //    menu.AddItem(new GUIContent(((IContextMenuItemCommand)contextCommand).Path), ((IContextMenuItemCommand)contextCommand).Checked, () =>
+        //    {
+        //        ExecuteCommand(command,this);
+        //    });
+        //}
 
-        if (Data.CurrentFilter.IsAllowed(null, typeof(EnumData)))
-            menu.AddItem(new GUIContent("New Enum"), false, () => { AddNewEnum(addAtMousePosition); });
 
-        if (Data.CurrentFilter.IsAllowed(null, typeof(ViewData)))
-            menu.AddItem(new GUIContent("New View"), false, () => { AddNewView(addAtMousePosition); });
+        //if (Data.CurrentFilter.IsAllowed(null, typeof(ElementData)))
+        //    menu.AddItem(new GUIContent("New Element"), false, () => { AddNewViewModel(addAtMousePosition); });
 
-        if (Data.CurrentFilter.IsAllowed(null, typeof(ViewComponentData)))
-            menu.AddItem(new GUIContent("New View Component"), false, () => { AddNewViewComponent(addAtMousePosition); });
+        //if (Data.CurrentFilter.IsAllowed(null, typeof(EnumData)))
+        //    menu.AddItem(new GUIContent("New Enum"), false, () => { AddNewEnum(addAtMousePosition); });
 
-        if (Data.CurrentFilter.IsAllowed(null, typeof(SceneManagerData)))
-            menu.AddItem(new GUIContent("New Scene Manager"), false, () => { AddNewSceneManager(addAtMousePosition); });
+        //if (Data.CurrentFilter.IsAllowed(null, typeof(ViewData)))
+        //    menu.AddItem(new GUIContent("New View"), false, () => { AddNewView(addAtMousePosition); });
 
-        if (Data.CurrentFilter.IsAllowed(null, typeof(SubSystemData)))
-            menu.AddItem(new GUIContent("New Sub System"), false, () => { AddNewSubDiagram(addAtMousePosition); });
+        //if (Data.CurrentFilter.IsAllowed(null, typeof(ViewComponentData)))
+        //    menu.AddItem(new GUIContent("New View Component"), false, () => { AddNewViewComponent(addAtMousePosition); });
 
-        foreach (var diagramPlugin in Plugins)
-        {
-            if (diagramPlugin == null) continue;
-            diagramPlugin.OnAddContextItems(this, menu);
-        }
+        //if (Data.CurrentFilter.IsAllowed(null, typeof(SceneManagerData)))
+        //    menu.AddItem(new GUIContent("New Scene Manager"), false, () => { AddNewSceneManager(addAtMousePosition); });
 
-        menu.AddSeparator("");
-        foreach (var item in Data.ImportableItems)
-        {
-            IDiagramItem item1 = item;
-            menu.AddItem(new GUIContent(item.Name), false, () =>
-            {
-                Undo.RecordObject(Data, "Import " + item1.Name);
-                Data.CurrentFilter.Locations[item1] = new Vector2(0f, 0f);
-                Refresh(true);
-                EditorUtility.SetDirty(Data);
-            });
-        }
-        menu.AddSeparator("");
+        //if (Data.CurrentFilter.IsAllowed(null, typeof(SubSystemData)))
+        //    menu.AddItem(new GUIContent("New Sub System"), false, () => { AddNewSubDiagram(addAtMousePosition); });
 
-        menu.AddItem(new GUIContent("Import All"), false, () =>
-        {
-            Undo.RecordObject(Data, "Import All");
-            foreach (var importableItem in Data.ImportableItems)
-            {
-                Data.CurrentFilter.Locations[importableItem] = new Vector2(0f, 0f);
-            }
-            Refresh(true);
-            EditorUtility.SetDirty(Data);
-        });
+        //foreach (var diagramPlugin in Plugins)
+        //{
+        //    if (diagramPlugin == null) continue;
+        //    diagramPlugin.OnAddContextItems(this, menu);
+        //}
 
-        menu.ShowAsContext();
+        //menu.AddSeparator("");
+        //foreach (var item in Data.ImportableItems)
+        //{
+        //    IDiagramItem item1 = item;
+        //    menu.AddItem(new GUIContent(item.Name), false, () =>
+        //    {
+        //        Undo.RecordObject(Data, "Import " + item1.Name);
+        //        Data.CurrentFilter.Locations[item1] = new Vector2(0f, 0f);
+        //        Refresh(true);
+        //        EditorUtility.SetDirty(Data);
+        //    });
+        //}
+        //menu.AddSeparator("");
+
+        //menu.AddItem(new GUIContent("Import All"), false, () =>
+        //{
+        //    Undo.RecordObject(Data, "Import All");
+        //    foreach (var importableItem in Data.ImportableItems)
+        //    {
+        //        Data.CurrentFilter.Locations[importableItem] = new Vector2(0f, 0f);
+        //    }
+        //    Refresh(true);
+        //    EditorUtility.SetDirty(Data);
+        //});
+
+        //menu.ShowAsContext();
     }
 
     public void ShowContextMenu()
     {
-        var menu = new GenericMenu();
 
-        DecorateContextMenu(SelectedData, menu);
+        var menu = uFrameEditor.CreateCommandUI<ContextMenuUI>(Selected, typeof (IDiagramItemCommand), Selected.CommandsType);
+        menu.Go();
 
-        menu.AddSeparator(string.Empty);
-        var links = Data.Links.Where(p => p.Target == SelectedData);
-        foreach (var diagramLink in links)
-        {
-            if (!(diagramLink.Target is IDiagramItem)) continue;
+        //var menu = new GenericMenu();
 
-            IDiagramLink link = diagramLink;
-            menu.AddItem(new GUIContent(diagramLink.Source.Label), true, () =>
-            {
-                link.Source.RemoveLink(link.Target as IDiagramItem);
-                Refresh();
-            });
-        }
+        //DecorateContextMenu(SelectedData, menu);
 
-        menu.AddSeparator(string.Empty);
-        menu.AddItem(new GUIContent("Delete"), false, () =>
-        {
-            var selected = SelectedData;
-            var customFiles = Repository.GetCustomFilePaths(SelectedData, false).ToArray();
-            var customFileFullPaths = Repository.GetCustomFilePaths(SelectedData, true).Where(File.Exists).ToArray();
-            if (selected is IDiagramFilter)
-            {
-                var filter = selected as IDiagramFilter;
-                if (filter.Locations.Keys.Count > 1)
-                {
-                    EditorUtility.DisplayDialog("Delete sub items first.",
-                        "There are items defined inside this item please hide or delete them before removing this item.","OK");
-                    return;
-                }
-            }
-            if (EditorUtility.DisplayDialog("Confirm", "Are you sure you want to delete this?", "Yes", "No"))
-            {
-               
-                selected.RemoveFromDiagram();
-                if (customFileFullPaths.Length > 0)
-                {
-                    if (EditorUtility.DisplayDialog("Confirm",
-                        "You have files associated with this. Delete them to?" + Environment.NewLine +
-                        string.Join(Environment.NewLine, customFiles), "Yes Delete Them", "Don't Delete them"))
-                    {
-                        foreach (var customFileFullPath in customFileFullPaths)
-                        {
-                            File.Delete(customFileFullPath);
-                        }
-                        Repository.Save();
-                    }
-                }
+        //menu.AddSeparator(string.Empty);
+        //var links = Data.Links.Where(p => p.Target == SelectedData);
+        //foreach (var diagramLink in links)
+        //{
+        //    if (!(diagramLink.Target is IDiagramItem)) continue;
 
-                Refresh(true);
-            }
-        });
+        //    IDiagramLink link = diagramLink;
+        //    menu.AddItem(new GUIContent(diagramLink.Source.Label), true, () =>
+        //    {
+        //        link.Source.RemoveLink(link.Target as IDiagramItem);
+        //        Refresh();
+        //    });
+        //}
 
-        if (menu.GetItemCount() > 0)
-        {
-            menu.ShowAsContext();
-        }
+        //menu.AddSeparator(string.Empty);
+        //menu.AddItem(new GUIContent("Delete"), false, () =>
+        //{
+        //    var selected = SelectedData;
+        //    var customFiles = Repository.GetCustomFilePaths(SelectedData, false).ToArray();
+        //    var customFileFullPaths = Repository.GetCustomFilePaths(SelectedData, true).Where(File.Exists).ToArray();
+        //    if (selected is IDiagramFilter)
+        //    {
+        //        var filter = selected as IDiagramFilter;
+        //        if (filter.Locations.Keys.Count > 1)
+        //        {
+        //            EditorUtility.DisplayDialog("Delete sub items first.",
+        //                "There are items defined inside this item please hide or delete them before removing this item.", "OK");
+        //            return;
+        //        }
+        //    }
+        //    if (EditorUtility.DisplayDialog("Confirm", "Are you sure you want to delete this?", "Yes", "No"))
+        //    {
+
+        //        selected.RemoveFromDiagram();
+        //        if (customFileFullPaths.Length > 0)
+        //        {
+        //            if (EditorUtility.DisplayDialog("Confirm",
+        //                "You have files associated with this. Delete them to?" + Environment.NewLine +
+        //                string.Join(Environment.NewLine, customFiles), "Yes Delete Them", "Don't Delete them"))
+        //            {
+        //                foreach (var customFileFullPath in customFileFullPaths)
+        //                {
+        //                    File.Delete(customFileFullPath);
+        //                }
+        //                Repository.Save();
+        //            }
+        //        }
+
+        //        Refresh(true);
+        //    }
+        //});
+
+        //if (menu.GetItemCount() > 0)
+        //{
+        //    menu.ShowAsContext();
+        //}
     }
 
     public void ShowItemContextMenu(object item)
@@ -866,140 +723,93 @@ public class ElementsDiagram
 
     protected virtual void DecorateContextMenu(object context, GenericMenu menu)
     {
-        var methods = context.GetType().GetMethods(BindingFlags.Public | BindingFlags.Instance);
-        var properties = context.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance);
+        //var methods = context.GetType().GetMethods(BindingFlags.Public | BindingFlags.Instance);
+        //var properties = context.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance);
 
-        foreach (var propertyInfo in properties)
-        {
-            var attribute = propertyInfo.GetCustomAttributes(typeof(DiagramContextMenuAttribute), true).FirstOrDefault() as DiagramContextMenuAttribute;
-            if (attribute == null) continue;
-            var value = (bool)propertyInfo.GetValue(context, null);
-            PropertyInfo info = propertyInfo;
-            menu.AddItem(new GUIContent(attribute.MenuPath), value, () =>
-            {
-                try
-                {
-                    info.SetValue(context, !value, null);
-                }
-                catch (Exception ex)
-                {
-                    EditorUtility.DisplayDialog("Can't do that", ex.InnerException.Message, "OK");
-                }
-            });
-        }
-        if (menu.GetItemCount() > 0)
-        {
-            menu.AddSeparator("");
-        }
+        //foreach (var propertyInfo in properties)
+        //{
+        //    var attribute = propertyInfo.GetCustomAttributes(typeof(DiagramContextMenuAttribute), true).FirstOrDefault() as DiagramContextMenuAttribute;
+        //    if (attribute == null) continue;
+        //    var value = (bool)propertyInfo.GetValue(context, null);
+        //    PropertyInfo info = propertyInfo;
+        //    menu.AddItem(new GUIContent(attribute.MenuPath), value, () =>
+        //    {
+        //        try
+        //        {
+        //            info.SetValue(context, !value, null);
+        //        }
+        //        catch (Exception ex)
+        //        {
+        //            EditorUtility.DisplayDialog("Can't do that", ex.InnerException.Message, "OK");
+        //        }
+        //    });
+        //}
+        //if (menu.GetItemCount() > 0)
+        //{
+        //    menu.AddSeparator("");
+        //}
 
-        var items = new List<ContextMenuItem>();
-        foreach (var methodInfo in methods)
-        {
-            var attribute = methodInfo.GetCustomAttributes(typeof(DiagramContextMenuAttribute), true).FirstOrDefault() as DiagramContextMenuAttribute;
-            if (attribute == null) continue;
-            var item = new ContextMenuItem()
-            {
-                Attribute = attribute,
-                ActionMethod = methodInfo,
-            };
-            items.Add(item);
-        }
+        //var items = new List<ContextMenuItem>();
+        //foreach (var methodInfo in methods)
+        //{
+        //    var attribute = methodInfo.GetCustomAttributes(typeof(DiagramContextMenuAttribute), true).FirstOrDefault() as DiagramContextMenuAttribute;
+        //    if (attribute == null) continue;
+        //    var item = new ContextMenuItem()
+        //    {
+        //        Attribute = attribute,
+        //        ActionMethod = methodInfo,
+        //    };
+        //    items.Add(item);
+        //}
 
-        foreach (var contextMenuItem in items.OrderBy(p => p.Attribute.Index))
-        {
-            var checkedMethod = methods.FirstOrDefault(p => p.Name == contextMenuItem.ActionMethod.Name + "IsChecked");
-            var check = false;
-            if (checkedMethod != null)
-            {
-                check = (bool)checkedMethod.Invoke(context, null);
-            }
-            ContextMenuItem item = contextMenuItem;
-            menu.AddItem(new GUIContent(contextMenuItem.Attribute.MenuPath), check, () =>
-            {
-                Undo.RecordObject(this.Data, item.ActionMethod.Name);
-                var parameters = item.ActionMethod.GetParameters();
-                if (parameters.Length > 0)
-                {
-                    if (typeof(IDiagramItem).IsAssignableFrom(parameters[0].ParameterType))
-                    {
-                        item.ActionMethod.Invoke(context, new object[] { SelectedData });
-                    }
-                    else if (parameters[0].ParameterType == typeof(IElementsDataRepository))
-                    {
-                        item.ActionMethod.Invoke(context, new object[] { Repository });
-                    }
-                    else
-                    {
-                        item.ActionMethod.Invoke(context, new object[] { Data });
-                    }
-                }
-                else
-                {
-                    item.ActionMethod.Invoke(context, null);
-                }
-                Refresh(true);
-                EditorUtility.SetDirty(this.Data);
-            });
-        }
+        //foreach (var contextMenuItem in items.OrderBy(p => p.Attribute.Index))
+        //{
+        //    var checkedMethod = methods.FirstOrDefault(p => p.Name == contextMenuItem.ActionMethod.Name + "IsChecked");
+        //    var check = false;
+        //    if (checkedMethod != null)
+        //    {
+        //        check = (bool)checkedMethod.Invoke(context, null);
+        //    }
+        //    ContextMenuItem item = contextMenuItem;
+        //    menu.AddItem(new GUIContent(contextMenuItem.Attribute.MenuPath), check, () =>
+        //    {
+        //        Undo.RecordObject(this.Data, item.ActionMethod.Name);
+        //        var parameters = item.ActionMethod.GetParameters();
+        //        if (parameters.Length > 0)
+        //        {
+        //            if (typeof(IDiagramItem).IsAssignableFrom(parameters[0].ParameterType))
+        //            {
+        //                item.ActionMethod.Invoke(context, new object[] { SelectedData });
+        //            }
+        //            else if (parameters[0].ParameterType == typeof(IElementsDataRepository))
+        //            {
+        //                item.ActionMethod.Invoke(context, new object[] { Repository });
+        //            }
+        //            else
+        //            {
+        //                item.ActionMethod.Invoke(context, new object[] { Data });
+        //            }
+        //        }
+        //        else
+        //        {
+        //            item.ActionMethod.Invoke(context, null);
+        //        }
+        //        Refresh(true);
+        //        EditorUtility.SetDirty(this.Data);
+        //    });
+        //}
 
-        foreach (var diagramPlugin in Plugins)
-        {
-            if (diagramPlugin == null) continue;
-            diagramPlugin.OnAddContextItems(this, menu);
-        }
-    }
-
-    protected virtual void OnAddNewBehaviourClicked(ElementData data)
-    {
-        ViewModelDataEventHandler handler = AddNewBehaviourClicked;
-        if (handler != null) handler(data);
+        //foreach (var diagramPlugin in Plugins)
+        //{
+        //    if (diagramPlugin == null) continue;
+        //    diagramPlugin.OnAddContextItems(this, menu);
+        //}
     }
 
     protected virtual void OnSelectionChanged(IDiagramItem olddata, IDiagramItem newdata)
     {
         SelectionChangedEventArgs handler = SelectionChanged;
         if (handler != null) handler(olddata, newdata);
-    }
-
-    private void AddNewBehaviour(ElementData data)
-    {
-        OnAddNewBehaviourClicked(data);
-    }
-
-    private void AddNewCollection(ElementData data)
-    {
-        Undo.RecordObject(Data, "Add New Collection");
-        data.Collections.Add(new ViewModelCollectionData()
-        {
-            Name = GetUniqueName("NewCollection"),
-            ItemType = typeof(string)
-        });
-        Refresh(true);
-        EditorUtility.SetDirty(Data);
-    }
-
-    private void AddNewCommand(ElementData data)
-    {
-        Undo.RecordObject(Data, "Add New Command");
-        data.Commands.Add(new ViewModelCommandData()
-        {
-            Name = GetUniqueName("NewCommand"),
-        });
-        Refresh(true);
-        EditorUtility.SetDirty(Data);
-    }
-
-    private void AddNewProperty(ElementData data)
-    {
-        Undo.RecordObject(Data, "Add New Property");
-        data.Properties.Add(new ViewModelPropertyData()
-        {
-            DefaultValue = string.Empty,
-            Name = GetUniqueName("String1"),
-            Type = typeof(string)
-        });
-        Refresh(true);
-        EditorUtility.SetDirty(Data);
     }
 
     private void DoViewModelInspector(ElementDataBase selected)
@@ -1038,38 +848,38 @@ public class ElementsDiagram
         //}
     }
 
-    private void OnAdd(string name, string value)
-    {
-    }
-
     private void OnDoubleClick()
     {
-        if (SelectedData != null && SelectedItem == null)
+
+        if (SelectedData != null)
         {
-            if (SelectedData is IDiagramFilter)
+            if (SelectedItem == null)
             {
-                if (SelectedData == Data.CurrentFilter)
+                if (SelectedData is IDiagramFilter)
                 {
-                    Data.PopFilter();
+                    if (SelectedData == Data.CurrentFilter)
+                    {
+                        Data.PopFilter();
+                    }
+                    else
+                    {
+                        Data.PushFilter(SelectedData as IDiagramFilter);
+                    }
+
+                    Refresh(true);
                 }
                 else
                 {
-                    Data.PushFilter(SelectedData as IDiagramFilter);
+                    Selected.DoubleClicked();
                 }
-
-                Refresh(true);
             }
-            //var data = Selected as SceneManagerData;
-            //if (data != null)
-            //{
-            //    data.CreateScene(Repository);
-            //}
+
         }
+
     }
 
     private void OnMouseDown()
     {
-       
         var selected = MouseOverViewData;
         if (selected != null)
         {
@@ -1093,14 +903,14 @@ public class ElementsDiagram
         {
             //if (AllSelected.All(p => p != SelectedData))
             //{
-                foreach (var diagramItem in AllSelected)
+            foreach (var diagramItem in AllSelected)
+            {
+                if (diagramItem.IsEditing)
                 {
-                    if (diagramItem.IsEditing)
-                    {
-                        diagramItem.EndEditing(Repository);
-                    }
-                    diagramItem.IsSelected = false;
+                    diagramItem.EndEditing();
                 }
+                diagramItem.IsSelected = false;
+            }
             //}
         }
 
@@ -1112,6 +922,7 @@ public class ElementsDiagram
         get { return Event.current; }
         set { _currentEvent = value; }
     }
+
     private void OnMouseUp()
     {
         if (CurrentEvent.button == 1)
@@ -1178,5 +989,33 @@ public class ElementsDiagram
             EditorUtility.SetDirty(Data);
         }
         DidDrag = false;
+    }
+
+    public void Execute(IEditorCommand command)
+    {
+        EditorUtility.SetDirty(Data);
+        Undo.RecordObject(Data, command.Title);
+        this.ExecuteCommand(command);
+        Refresh();
+    }
+
+    public IEnumerable<object> ContextObjects
+    {
+        get
+        {
+            yield return this;
+            if (Data != null)
+            {
+                yield return Data;
+            }
+            foreach (var diagramItem in AllSelected)
+            {
+                yield return diagramItem;
+                if (diagramItem.Data != null)
+                {
+                    yield return diagramItem.Data;
+                }
+            }
+        }
     }
 }

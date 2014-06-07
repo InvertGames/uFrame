@@ -1,12 +1,20 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Invert.uFrame;
+using Invert.uFrame.Editor.ElementDesigner;
 using UnityEditor;
 using UnityEngine;
 
 public abstract class DiagramItemDrawer<TData> : IElementDrawer where TData : IDiagramItem
 {
     private static GUIStyle _itemStyle;
+    private TData _data;
+    [Inject]
+    public IUFrameContainer Container { get; set; }
+    protected DiagramItemDrawer()
+    {
+    }
 
     protected DiagramItemDrawer(TData data, ElementsDiagram diagram)
     {
@@ -14,9 +22,17 @@ public abstract class DiagramItemDrawer<TData> : IElementDrawer where TData : ID
         Diagram = diagram;
     }
 
-    public TData Data { get; set; }
+    public TData Data
+    {
+        get { return _data; }
+        set
+        {
+            _data = value;
+            CalculateBounds();
+        }
+    }
 
-    public float HeaderSize { get { return 35 ; } }
+    public virtual float HeaderSize { get { return 35 ; } }
 
     public float Scale
     {
@@ -96,7 +112,7 @@ public abstract class DiagramItemDrawer<TData> : IElementDrawer where TData : ID
         return itemRect;
     }
 
-    protected void DrawHeader(ElementsDiagram diagram, bool importOnly)
+    protected virtual void DrawHeader(ElementsDiagram diagram, bool importOnly)
     {
 
 
@@ -146,7 +162,7 @@ public abstract class DiagramItemDrawer<TData> : IElementDrawer where TData : ID
             if (EditorGUI.EndChangeCheck())
             {
                 Undo.RecordObject(diagram.Data, "Set Element Name");
-                Data.Rename(Diagram.Repository, newText);
+                Data.Rename(newText);
                 CalculateBounds();
                 EditorUtility.SetDirty(diagram.Data);
             }
@@ -173,13 +189,18 @@ public abstract class DiagramItemDrawer<TData> : IElementDrawer where TData : ID
 
     public ElementsDiagram Diagram { get; set; }
 
+    public virtual Type CommandsType
+    {
+        get { return typeof (IDiagramItem); }
+    }
+
     protected abstract IEnumerable<DiagramSubItemGroup> GetItemGroups();
 
     protected virtual void DrawContent(ElementsDiagram diagram, bool importOnly)
     {
         foreach (var diagramSubItemGroup in CachedItemGroups)
         {
-            diagramSubItemGroup.Header.Draw(Scale, BackgroundStyle);
+            diagramSubItemGroup.Header.Draw(Diagram, Scale, BackgroundStyle);
             foreach (var item in diagramSubItemGroup.Items)
             {
                 DrawItem(item, diagram, importOnly);
@@ -343,14 +364,14 @@ public abstract class DiagramItemDrawer<TData> : IElementDrawer where TData : ID
             {
                 Undo.RecordObject(diagram.Data, "Rename");
 
-                item.Rename(Diagram.Repository, Data, newName);
+                item.Rename(Data, newName);
                 EditorUtility.SetDirty(diagram.Data);
 
             }
         }
 
 
-        if (GUILayout.Button(string.Empty, UBStyles.RemoveButtonStyle))
+        if (GUILayout.Button(string.Empty, UBStyles.RemoveButtonStyle.Scale(Scale)))
         {
             Undo.RecordObject(diagram.Data, "RemoveFromDiagram " + item.Name);
             item.Remove(diagram.SelectedData);
@@ -377,7 +398,7 @@ public abstract class DiagramItemDrawer<TData> : IElementDrawer where TData : ID
     }
 
     public bool IsSelected { get { return Data.IsSelected; } }
-    public IDiagramItem Model { get { return Data; } }
+    public IDiagramItem Model { get { return Data; } set { Data = (TData)value; } }
 
     private float CalculateContentBounds(float startY, float width)
     {
@@ -395,6 +416,11 @@ public abstract class DiagramItemDrawer<TData> : IElementDrawer where TData : ID
     public IEnumerable<IDiagramSubItem> Items
     {
         get { return CachedItemGroups.SelectMany(p => p.Items); }
+    }
+
+    public virtual void DoubleClicked()
+    {
+            
     }
 
     private float CalculateGroupBounds(DiagramSubItemGroup group, float width, float startY)
@@ -416,4 +442,19 @@ public abstract class DiagramItemDrawer<TData> : IElementDrawer where TData : ID
         return sy;
     }
 
+    public void Execute(IEditorCommand command)
+    {
+        UnityEngine.Debug.Log("Exeucting: " + command.Name);
+        Diagram.Execute(command);
+    }
+
+    public IEnumerable<object> ContextObjects
+    {
+        get
+        {
+            yield return this;
+            yield return Data;
+            yield return Diagram;
+        }
+    }
 }

@@ -100,15 +100,14 @@ public abstract class BeizureLink : IDiagramLink
         _startRight = index1 == 0 && index2 == 0 ? index1 == 1 : index2 == 1;
         _endRight = index1 == 1 && index2 == 1 ? index2 == 1 : index1 == 1;
 
-        var startTan = _startPos + (_endRight ? Vector3.right : Vector3.left) * 50;
+        var startTan = _startPos + (_endRight ? Vector3.right : Vector3.left) * 35;
 
-        var endTan = _endPos + (_startRight ? Vector3.right : Vector3.left) * 50;
+        var endTan = _endPos + (_startRight ? Vector3.right : Vector3.left) * 35;
 
         var shadowCol = new Color(0, 0, 0, 0.1f);
 
         for (int i = 0; i < 3; i++) // Draw a shadow
-
-            Handles.DrawBezier(_startPos, _endPos, startTan, endTan, shadowCol, null, (i + 1) * 5);
+           Handles.DrawBezier(_startPos, _endPos, startTan, endTan, shadowCol, null, (i + 1) * 5);
 
         Handles.DrawBezier(_startPos, _endPos, startTan, endTan, color, null, width);
 

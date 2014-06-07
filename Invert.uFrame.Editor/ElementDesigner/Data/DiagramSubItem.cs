@@ -95,12 +95,12 @@ public abstract class DiagramSubItem : IDiagramSubItem
     public abstract IEnumerable<IDiagramLink> GetLinks(IDiagramItem[] data);
     public abstract void Remove(IDiagramItem diagramItem);
 
-    public virtual void Rename(IElementsDataRepository repository, IDiagramItem data, string name)
+    public virtual void Rename(IDiagramItem data, string name)
     {
         Name = name;
     }
 
-    public void Applied()
+    public void RefactorApplied()
     {
         Refactorings.Clear();
     }

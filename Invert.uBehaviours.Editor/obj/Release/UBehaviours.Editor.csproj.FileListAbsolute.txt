@@ -1,0 +1,12 @@
+D:\Invert\uFrame\UBehaviours.Editor\bin\Release\UBehaviours.Editor.dll
+D:\Invert\uFrame\UBehaviours.Editor\bin\Release\UBehaviours.Editor.pdb
+D:\Invert\uFrame\UBehaviours.Editor\bin\Release\UBehaviours.dll
+D:\Invert\uFrame\UBehaviours.Editor\bin\Release\UnityEditor.dll
+D:\Invert\uFrame\UBehaviours.Editor\bin\Release\UnityEngine.dll
+D:\Invert\uFrame\UBehaviours.Editor\bin\Release\UBehaviours.pdb
+D:\Invert\uFrame\UBehaviours.Editor\bin\Release\UnityEditor.xml
+D:\Invert\uFrame\UBehaviours.Editor\bin\Release\UnityEngine.xml
+D:\Invert\uFrame\UBehaviours.Editor\obj\Release\UBehaviours.Editor.csprojResolveAssemblyReference.cache
+D:\Invert\uFrame\UBehaviours.Editor\obj\Release\UBehaviours.Editor.dll
+D:\Invert\uFrame\UBehaviours.Editor\obj\Release\UBehaviours.Editor.pdb
+D:\Invert\uFrame\UBehaviours.Editor\bin\Release\UBehaviours.xml

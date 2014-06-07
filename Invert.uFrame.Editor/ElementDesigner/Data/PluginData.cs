@@ -65,6 +65,10 @@ namespace Invert.uFrame.Editor.ElementDesigner.Data
 
     public class PluginDrawer : DiagramItemDrawer<PluginData>
     {
+        public PluginDrawer()
+        {
+        }
+
         public PluginDrawer(PluginData data, ElementsDiagram diagram) : base(data, diagram)
         {
             
@@ -78,18 +82,12 @@ namespace Invert.uFrame.Editor.ElementDesigner.Data
 
     public interface IDiagramPlugin
     {
-
-        IElementDrawer GetDrawer(ElementsDiagram diagram, IDiagramItem data);
-
-        void OnAddContextItems(ElementsDiagram diagram, GenericMenu menu);
-
+        void Initialize(uFrameContainer container);
     }
 
     public abstract class DiagramPlugin :IDiagramPlugin
     {
-        public abstract IElementDrawer GetDrawer(ElementsDiagram diagram, IDiagramItem data);
-        public abstract void OnAddContextItems(ElementsDiagram diagram, GenericMenu menu);
 
-       
+        public abstract void Initialize(uFrameContainer container);
     }
 }

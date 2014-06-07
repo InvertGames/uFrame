@@ -126,7 +126,6 @@ public class ModelViewModelCollectionBinding : Binding
 
     public string ViewName { get; set; }
 
-
     public ModelViewModelCollectionBinding Immediate(bool immediate = true)
     {
         IsImmediate = immediate;
@@ -175,6 +174,7 @@ public class ModelViewModelCollectionBinding : Binding
         get { return _gameObjectLookup ?? (_gameObjectLookup = new Dictionary<int, GameObject>()); }
         set { _gameObjectLookup = value; }
     }
+
     public Dictionary<ViewModel, int> ObjectIdLookup
     {
         get { return _objectIdLookup ?? (_objectIdLookup = new Dictionary<ViewModel, int>()); }

@@ -1,0 +1,9 @@
+D:\Invert\uFrame\UBehaviours\bin\Release\UBehaviours.dll
+D:\Invert\uFrame\UBehaviours\bin\Release\UBehaviours.pdb
+D:\Invert\uFrame\UBehaviours\bin\Release\UnityEditor.dll
+D:\Invert\uFrame\UBehaviours\bin\Release\UnityEngine.dll
+D:\Invert\uFrame\UBehaviours\bin\Release\UnityEditor.xml
+D:\Invert\uFrame\UBehaviours\bin\Release\UnityEngine.xml
+D:\Invert\uFrame\UBehaviours\obj\Release\UBehaviours.dll
+D:\Invert\uFrame\UBehaviours\obj\Release\UBehaviours.pdb
+D:\Invert\uFrame\UBehaviours\bin\Release\UBehaviours.XML

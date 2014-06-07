@@ -104,9 +104,9 @@ public abstract class DiagramItem :  IDiagramItem, IRefactorable
         Filter.Locations.Remove(this.Identifier);
     }
 
-    public void Rename(IElementsDataRepository repository,  IDiagramItem data, string name)
+    public void Rename(IDiagramItem data, string name)
     {
-        Rename((IElementsDataRepository) repository, name);
+        Rename(name);
     }
 
     public List<Refactorer> Refactorings
@@ -131,8 +131,9 @@ public abstract class DiagramItem :  IDiagramItem, IRefactorable
     }
 
     public RenameRefactorer RenameRefactorer { get; set; }
-   
-    public virtual void EndEditing(IElementsDataRepository repository)
+
+    public virtual bool ShouldRenameRefactor { get { return true; } }
+    public virtual void EndEditing()
     {
         IsEditing = false;
         if (Data.DiagramItems.Count(p => p.Name == Name) > 1)
@@ -147,7 +148,7 @@ public abstract class DiagramItem :  IDiagramItem, IRefactorable
             {
                 return;
             }
-
+            
             RenameRefactorer.Set(this);
             if (!Refactorings.Contains(RenameRefactorer))
             {
@@ -155,7 +156,7 @@ public abstract class DiagramItem :  IDiagramItem, IRefactorable
             }
         }
     }
-    public virtual void Applied()
+    public virtual void RefactorApplied()
     {
         Refactorings.Clear();
         RenameRefactorer = null;
@@ -195,7 +196,7 @@ public abstract class DiagramItem :  IDiagramItem, IRefactorable
 
     public bool Dirty { get; set; }
 
-    public virtual void Rename(IElementsDataRepository repository, string newName)
+    public virtual void Rename( string newName)
     {
 
         Name = newName;

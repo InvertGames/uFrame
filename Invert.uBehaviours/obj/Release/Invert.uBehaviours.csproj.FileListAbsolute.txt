@@ -1,0 +1,12 @@
+D:\Invert\uFrame\UBehaviours\bin\Release\Invert.uBehaviours.dll
+D:\Invert\uFrame\UBehaviours\bin\Release\UBehaviours.XML
+D:\Invert\uFrame\UBehaviours\bin\Release\UnityEngine.dll
+D:\Invert\uFrame\UBehaviours\bin\Release\UnityEngine.xml
+D:\Invert\uFrame\UBehaviours\obj\Release\Invert.uBehaviours.dll
+D:\Invert\uFrame\UBehaviours\obj\Release\Invert.uBehaviours.csprojResolveAssemblyReference.cache
+D:\Invert\Git\uFrame\Invert.uBehaviours\bin\Release\Invert.uBehaviours.dll
+D:\Invert\Git\uFrame\Invert.uBehaviours\bin\Release\UBehaviours.XML
+D:\Invert\Git\uFrame\Invert.uBehaviours\bin\Release\UnityEngine.dll
+D:\Invert\Git\uFrame\Invert.uBehaviours\bin\Release\UnityEngine.xml
+D:\Invert\Git\uFrame\Invert.uBehaviours\obj\Release\Invert.uBehaviours.csprojResolveAssemblyReference.cache
+D:\Invert\Git\uFrame\Invert.uBehaviours\obj\Release\Invert.uBehaviours.dll

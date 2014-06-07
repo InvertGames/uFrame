@@ -1,0 +1,12 @@
+D:\Invert\Git\uFrame\Invert.uFrame.Editor.UnitTests\bin\Debug\Invert.uFrame.Editor.UnitTests.dll
+D:\Invert\Git\uFrame\Invert.uFrame.Editor.UnitTests\bin\Debug\Invert.uFrame.Editor.UnitTests.pdb
+D:\Invert\Git\uFrame\Invert.uFrame.Editor.UnitTests\bin\Debug\Invert.uFrame.Editor.dll
+D:\Invert\Git\uFrame\Invert.uFrame.Editor.UnitTests\bin\Debug\UnityEditor.dll
+D:\Invert\Git\uFrame\Invert.uFrame.Editor.UnitTests\bin\Debug\UnityEngine.dll
+D:\Invert\Git\uFrame\Invert.uFrame.Editor.UnitTests\bin\Debug\Invert.uBehaviours.Editor.dll
+D:\Invert\Git\uFrame\Invert.uFrame.Editor.UnitTests\bin\Debug\Invert.uBehaviours.dll
+D:\Invert\Git\uFrame\Invert.uFrame.Editor.UnitTests\bin\Debug\Invert.uFrame.Editor.pdb
+D:\Invert\Git\uFrame\Invert.uFrame.Editor.UnitTests\bin\Debug\Invert.uBehaviours.Editor.pdb
+D:\Invert\Git\uFrame\Invert.uFrame.Editor.UnitTests\obj\Debug\Invert.uFrame.Editor.UnitTests.csprojResolveAssemblyReference.cache
+D:\Invert\Git\uFrame\Invert.uFrame.Editor.UnitTests\obj\Debug\Invert.uFrame.Editor.UnitTests.dll
+D:\Invert\Git\uFrame\Invert.uFrame.Editor.UnitTests\obj\Debug\Invert.uFrame.Editor.UnitTests.pdb

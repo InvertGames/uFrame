@@ -76,8 +76,8 @@ public abstract class IntroductionMenuScreenViewBase : ViewBase {
     public virtual void ExecutePlay() {
         this.ExecuteCommand(IntroductionMenuScreen.Play);
     }
-    
-    protected override void InitializeViewModel(ViewModel viewModel) {
+
+    public override void InitializeViewModel(ViewModel viewModel) {
         IntroductionMenuScreenViewModel introductionMenuScreen = ((IntroductionMenuScreenViewModel)(viewModel));
         introductionMenuScreen.Title = this._Title;
     }
@@ -116,8 +116,8 @@ public abstract class IntroductionGameViewBase : ViewBase {
     public virtual void ExecuteExit() {
         this.ExecuteCommand(IntroductionGame.Exit);
     }
-    
-    protected override void InitializeViewModel(ViewModel viewModel) {
+
+    public override void InitializeViewModel(ViewModel viewModel) {
     }
 }
 

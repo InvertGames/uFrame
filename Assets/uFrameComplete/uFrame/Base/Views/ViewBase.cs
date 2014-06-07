@@ -400,7 +400,7 @@ public abstract class ViewBase : ViewContainer
     /// with any options specified in a unity component inspector.
     /// </summary>
     /// <param name="model">The model to initialize.</param>
-    protected abstract void InitializeViewModel(ViewModel model);
+    public abstract void InitializeViewModel(ViewModel model);
 
     protected virtual void LateUpdate()
     {

@@ -47,10 +47,10 @@
     </Reference>
     <Reference Include="System.Xml.Linq" />
     <Reference Include="AssetStoreTools">
-      <HintPath>Assets\PrivateStuff\AssetStoreTools\Editor\AssetStoreTools.dll</HintPath>
+      <HintPath>Assets\AssetStoreTools\Editor\AssetStoreTools.dll</HintPath>
     </Reference>
     <Reference Include="AssetStoreToolsExtra">
-      <HintPath>Assets\PrivateStuff\AssetStoreTools\Editor\AssetStoreToolsExtra.dll</HintPath>
+      <HintPath>Assets\AssetStoreTools\Editor\AssetStoreToolsExtra.dll</HintPath>
     </Reference>
     <Reference Include="dfScriptLite">
       <HintPath>Assets\PrivateStuff\Daikon Forge\DataBinding\Plugins\dfScriptLite.dll</HintPath>
@@ -310,29 +310,42 @@
     <Compile Include="Assets\PrivateStuff\PlayMaker\Editor\ReportWindow.cs" />
     <Compile Include="Assets\uFrameComplete\uBehaviours\Editor\TriggerListDrawer.cs" />
     <Compile Include="Assets\uFrameComplete\uFrame\Editor\DiagramPlugins\BehaviourSubItem.cs" />
-    <Compile Include="Assets\uFrameComplete\uFrame\Editor\DiagramPlugins\ElementGenerator.cs" />
-    <Compile Include="Assets\uFrameComplete\uFrame\Editor\DiagramPlugins\ElementGeneratorBase.cs" />
+    <Compile Include="Assets\uFrameComplete\uFrame\Editor\DiagramPlugins\CodeGenerator\ControllerFileGenerator.cs" />
+    <Compile Include="Assets\uFrameComplete\uFrame\Editor\DiagramPlugins\CodeGenerator\ControllerGenerator.cs" />
+    <Compile Include="Assets\uFrameComplete\uFrame\Editor\DiagramPlugins\CodeGenerator\ElementDataGenerator.cs" />
+    <Compile Include="Assets\uFrameComplete\uFrame\Editor\DiagramPlugins\CodeGenerator\ElementGenerator.cs" />
+    <Compile Include="Assets\uFrameComplete\uFrame\Editor\DiagramPlugins\CodeGenerator\ElementGeneratorBase.cs" />
+    <Compile Include="Assets\uFrameComplete\uFrame\Editor\DiagramPlugins\CodeGenerator\EnumCodeGenerator.cs" />
+    <Compile Include="Assets\uFrameComplete\uFrame\Editor\DiagramPlugins\CodeGenerator\SceneManagerGenerator.cs" />
+    <Compile Include="Assets\uFrameComplete\uFrame\Editor\DiagramPlugins\CodeGenerator\UFrameEditorPlugin.cs" />
+    <Compile Include="Assets\uFrameComplete\uFrame\Editor\DiagramPlugins\CodeGenerator\ViewBaseGenerator.cs" />
+    <Compile Include="Assets\uFrameComplete\uFrame\Editor\DiagramPlugins\CodeGenerator\ViewClassGenerator.cs" />
+    <Compile Include="Assets\uFrameComplete\uFrame\Editor\DiagramPlugins\CodeGenerator\ViewComponentGenerator.cs" />
+    <Compile Include="Assets\uFrameComplete\uFrame\Editor\DiagramPlugins\CodeGenerator\ViewFileGenerator.cs" />
+    <Compile Include="Assets\uFrameComplete\uFrame\Editor\DiagramPlugins\CodeGenerator\ViewGenerator.cs" />
+    <Compile Include="Assets\uFrameComplete\uFrame\Editor\DiagramPlugins\CodeGenerator\ViewModelFileGenerator.cs" />
+    <Compile Include="Assets\uFrameComplete\uFrame\Editor\DiagramPlugins\CodeGenerator\ViewModelGenerator.cs" />
     <Compile Include="Assets\uFrameComplete\uFrame\Editor\DiagramPlugins\UBehavioursPlugin.cs" />
     <Compile Include="Assets\uFrameComplete\uFrame\Editor\DiagramPlugins\UBehavioursViewDrawer.cs" />
     <Compile Include="Assets\uFrameComplete\uFrame\Editor\ElementsDataRepository.cs" />
     <Compile Include="Assets\uFrameComplete\uFrame\Editor\ElementsDesigner.cs" />
     <Compile Include="Assets\uFrameComplete\uFrame\Editor\uFrameEditors\AssemblyNameProvider.cs" />
-    <Compile Include="Assets\uFrameComplete\uFrame\Editor\uFrameEditors\ComponentBindingEditor.cs" />
-    <Compile Include="Assets\uFrameComplete\uFrame\Editor\uFrameEditors\ComponentCollectionBindingEditor.cs" />
-    <Compile Include="Assets\uFrameComplete\uFrame\Editor\uFrameEditors\ComponentCollisionEventBindingEditor.cs" />
-    <Compile Include="Assets\uFrameComplete\uFrame\Editor\uFrameEditors\ComponentCommandBindingEditor.cs" />
-    <Compile Include="Assets\uFrameComplete\uFrame\Editor\uFrameEditors\ComponentEventBindingEditor.cs" />
-    <Compile Include="Assets\uFrameComplete\uFrame\Editor\uFrameEditors\ComponentKeyBindingEditor.cs" />
-    <Compile Include="Assets\uFrameComplete\uFrame\Editor\uFrameEditors\ComponentMouseButtonEventBindingEditor.cs" />
-    <Compile Include="Assets\uFrameComplete\uFrame\Editor\uFrameEditors\ComponentPropertyBindingEditor.cs" />
+    <Compile Include="Assets\uFrameComplete\uFrame\Editor\uFrameEditors\ComponentBindingInspector.cs" />
+    <Compile Include="Assets\uFrameComplete\uFrame\Editor\uFrameEditors\ComponentCollectionBindingInspector.cs" />
+    <Compile Include="Assets\uFrameComplete\uFrame\Editor\uFrameEditors\ComponentCollisionEventBindingInspector.cs" />
+    <Compile Include="Assets\uFrameComplete\uFrame\Editor\uFrameEditors\ComponentCommandBindingInspector.cs" />
+    <Compile Include="Assets\uFrameComplete\uFrame\Editor\uFrameEditors\ComponentEventBindingInspector.cs" />
+    <Compile Include="Assets\uFrameComplete\uFrame\Editor\uFrameEditors\ComponentKeyBindingInspector.cs" />
+    <Compile Include="Assets\uFrameComplete\uFrame\Editor\uFrameEditors\ComponentMouseButtonEventBindingInspector.cs" />
+    <Compile Include="Assets\uFrameComplete\uFrame\Editor\uFrameEditors\ComponentPropertyBindingInspector.cs" />
     <Compile Include="Assets\uFrameComplete\uFrame\Editor\uFrameEditors\ControllerEditor.cs" />
     <Compile Include="Assets\uFrameComplete\uFrame\Editor\uFrameEditors\GameEditor.cs" />
-    <Compile Include="Assets\uFrameComplete\uFrame\Editor\uFrameEditors\GameManagerEditor.cs" />
-    <Compile Include="Assets\uFrameComplete\uFrame\Editor\uFrameEditors\ManagerEditor.cs" />
+    <Compile Include="Assets\uFrameComplete\uFrame\Editor\uFrameEditors\GameManagerInspector.cs" />
+    <Compile Include="Assets\uFrameComplete\uFrame\Editor\uFrameEditors\ManagerInspector.cs" />
     <Compile Include="Assets\uFrameComplete\uFrame\Editor\uFrameEditors\UFrameBehaviourEditor.cs" />
-    <Compile Include="Assets\uFrameComplete\uFrame\Editor\uFrameEditors\uFrameEditor.cs" />
-    <Compile Include="Assets\uFrameComplete\uFrame\Editor\uFrameEditors\uFrameHierarchyIcons.cs" />
-    <Compile Include="Assets\uFrameComplete\uFrame\Editor\uFrameEditors\ViewEditor.cs" />
+    <Compile Include="Assets\uFrameComplete\uFrame\Editor\uFrameEditors\uFrameEditorSceneManager.cs" />
+    <Compile Include="Assets\uFrameComplete\uFrame\Editor\uFrameEditors\uFrameInspector.cs" />
+    <Compile Include="Assets\uFrameComplete\uFrame\Editor\uFrameEditors\ViewInspector.cs" />
     <Compile Include="Assets\uFrameComplete\uFrameBehaviours\Editor\ViewModelCommandsDrawer.cs" />
     <None Include="Assets\PrivateStuff\AssetStoreStuff\ExtractDocXMLRegex.txt" />
     <None Include="Assets\PrivateStuff\AssetStoreStuff\research.txt" />
@@ -431,8 +444,8 @@
     <None Include="Assets\XmlDocs\Assembly-CSharp.XML" />
     <None Include="Assets\XmlDocs\UBehaviours.XML" />
     <None Include="Assets\XmlDocs\UnityEngine.xml" />
-    <None Include="Assets\PrivateStuff\AssetStoreTools\Editor\AssetStoreTools.dll" />
-    <None Include="Assets\PrivateStuff\AssetStoreTools\Editor\AssetStoreToolsExtra.dll" />
+    <None Include="Assets\AssetStoreTools\Editor\AssetStoreTools.dll" />
+    <None Include="Assets\AssetStoreTools\Editor\AssetStoreToolsExtra.dll" />
     <None Include="Assets\PrivateStuff\Photon Unity Networking\Editor\PhotonNetwork\Newtonsoft.Json.dll" />
     <None Include="Assets\PrivateStuff\PlayMaker\Editor\de\PlayMakerEditor.de.resources.dll" />
     <None Include="Assets\PrivateStuff\PlayMaker\Editor\es-ES\PlayMakerEditor.es-ES.resources.dll" />

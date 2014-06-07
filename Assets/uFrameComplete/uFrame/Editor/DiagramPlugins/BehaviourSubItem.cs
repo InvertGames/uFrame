@@ -98,7 +98,7 @@ public class BehaviourSubItem : IDiagramSubItem
         
 
     }
-    public void Rename(IElementsDataRepository repository, IDiagramItem data, string name)
+    public void Rename(IDiagramItem data, string name)
     {
         _renameTo = name;
         Behaviour.name = name;

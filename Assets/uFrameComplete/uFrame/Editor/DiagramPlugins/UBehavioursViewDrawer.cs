@@ -1,7 +1,11 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.IO;
 using System.Linq;
 using System.Text;
+using Invert.uFrame.Editor;
+using Invert.uFrame.Editor.ElementDesigner;
 using UnityEngine;
 
 namespace Assets.uFrameComplete.uFrame.Editor.DiagramPlugins
@@ -46,6 +50,10 @@ namespace Assets.uFrameComplete.uFrame.Editor.DiagramPlugins
 
     public class UBehavioursViewDrawer : ViewDrawer
     {
+        public UBehavioursViewDrawer()
+        {
+        }
+
         public UBehavioursViewDrawer(ViewData data, ElementsDiagram diagram)
             : base(data, diagram)
         {
@@ -64,17 +72,10 @@ namespace Assets.uFrameComplete.uFrame.Editor.DiagramPlugins
 
                 _behavioursHeader =
                     new DiagramItemHeader() { HeaderType = typeof(UBSharedBehaviour), Label = "Behaviours" };
-                _behavioursHeader.OnAddItem += BehavioursHeaderOnOnAddItem;
+                _behavioursHeader.AddCommand = Container.Resolve<AddNewBehaviourCommand>();
                 return _behavioursHeader;
             }
             set { _behavioursHeader = value; }
-        }
-
-        private void BehavioursHeaderOnOnAddItem()
-        {
-            var asset = UBAssetManager.CreateAsset<UFrameBehaviours>(Diagram.Repository.AssetPath, Data.Name + "Behaviour");
-            asset.ViewModelTypeString = Data.ViewForElement.ViewModelAssemblyQualifiedName;
-            Diagram.Refresh();
         }
 
         protected override IEnumerable<DiagramSubItemGroup> GetItemGroups()
@@ -98,5 +99,25 @@ namespace Assets.uFrameComplete.uFrame.Editor.DiagramPlugins
         }
 
         public UFrameBehaviours[] Behaviours { get; set; }
+    }
+
+    public class AddNewBehaviourCommand : EditorCommand<ViewData>
+    {
+        public override void Perform(ViewData item)
+        {
+            if (!Directory.Exists(BehavioursPath))
+            {
+                Directory.CreateDirectory(BehavioursPath);
+            }
+            var asset = UBAssetManager.CreateAsset<UFrameBehaviours>(BehavioursPath, item.Name + "Behaviour");
+            asset.ViewModelTypeString = item.ViewForElement.ViewModelAssemblyQualifiedName;
+            
+            //Save();
+        }
+
+        public override string CanPerform(ViewData item)
+        {
+            return null;
+        }
     }
 }

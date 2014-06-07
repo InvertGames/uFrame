@@ -1,0 +1,2 @@
+D:\Invert\uFrame\obj\Release\UnityVS.uFrame.CSharp.Editor.csprojResolveAssemblyReference.cache
+D:\Invert\Git\uFrame\obj\Release\UnityVS.uFrame.CSharp.Editor.csprojResolveAssemblyReference.cache

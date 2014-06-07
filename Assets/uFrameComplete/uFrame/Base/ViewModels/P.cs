@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Diagnostics;
 /// <summary>
 /// A typed ViewModel Property Class

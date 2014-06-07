@@ -12,6 +12,9 @@ public class ViewModelPropertyData : DiagramSubItem,IViewModelItem
     [SerializeField]
     private string _type;
 
+    [SerializeField]
+    private bool _isRealTimeProperty;
+
     public Type Type
     {
         get
@@ -70,6 +73,12 @@ public class ViewModelPropertyData : DiagramSubItem,IViewModelItem
         set { _type = value; }
     }
 
+    public bool IsRealTimeProperty
+    {
+        get { return _isRealTimeProperty; }
+        set { _isRealTimeProperty = value; }
+    }
+
     public string RelatedTypeName
     {
         get
@@ -82,11 +91,6 @@ public class ViewModelPropertyData : DiagramSubItem,IViewModelItem
     public bool AllowEmptyRelatedType
     {
         get { return false; }
-    }
-
-    public IEnumerable<ElementItemType> GetAvailableRelatedTypes(IElementsDataRepository repository)
-    {
-        return repository.GetAvailableTypes(false);
     }
 
     public string FieldName

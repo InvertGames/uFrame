@@ -34,23 +34,23 @@ public partial class FPSWeaponView
         }
     }
 
-public override void StateChanged(FPSWeaponState value)
-{
-    base.StateChanged(value);
-    // If we are reloading hide the gun
-    _ModelTransform.gameObject.SetActive(value != FPSWeaponState.Reloading);
+    public override void StateChanged(FPSWeaponState value)
+    {
+        base.StateChanged(value);
+        // If we are reloading hide the gun
+        _ModelTransform.gameObject.SetActive(value != FPSWeaponState.Reloading);
 
-    if (value == FPSWeaponState.Firing)
-    {
-        // Tell the Weapon Fire View Component to start firing
-        FPSWeaponFire.Fire();
+        if (value == FPSWeaponState.Firing)
+        {
+            // Tell the Weapon Fire View Component to start firing
+            FPSWeaponFire.Fire();
+        }
+        else
+        {
+            // Tell the Weapon Fire View Component to stop firing
+            FPSWeaponFire.StopFiring();
+        }
     }
-    else
-    {
-        // Tell the Weapon Fire View Component to stop firing
-        FPSWeaponFire.StopFiring();
-    }
-}
 
     public override void Bind()
     {

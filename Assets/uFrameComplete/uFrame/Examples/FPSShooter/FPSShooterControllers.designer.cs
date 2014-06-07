@@ -123,6 +123,7 @@ public abstract class FPSDamageableControllerBase : Controller {
     public override void WireCommands(ViewModel viewModel) {
         var fPSDamageable = viewModel as FPSDamageableViewModel;
         fPSDamageable.ApplyDamage = new CommandWithSenderAndArgument<FPSDamageableViewModel, int>(fPSDamageable, ApplyDamage);
+        
     }
     
     public override ViewModel CreateEmpty() {
@@ -159,6 +160,7 @@ public abstract class FPSEnemyControllerBase : FPSDamageableController {
     }
     
     public override void Initialize(ViewModel viewModel) {
+        base.Initialize(viewModel);
         this.InitializeFPSEnemy(((FPSEnemyViewModel)(viewModel)));
     }
 }
@@ -226,6 +228,7 @@ public abstract class FPSPlayerControllerBase : FPSDamageableController {
     }
     
     public override void Initialize(ViewModel viewModel) {
+        base.Initialize(viewModel);
         this.InitializeFPSPlayer(((FPSPlayerViewModel)(viewModel)));
     }
     
@@ -253,6 +256,7 @@ public abstract class FPSWeaponControllerBase : Controller {
         fPSWeapon.NextZoom = new CommandWithSender<FPSWeaponViewModel>(fPSWeapon, NextZoom);
         fPSWeapon.Reload = new YieldCommandWithSender<FPSWeaponViewModel>(fPSWeapon, Reload);
         fPSWeapon.EndFire = new CommandWithSender<FPSWeaponViewModel>(fPSWeapon, EndFire);
+        fPSWeapon.BulletFired = new CommandWithSender<FPSWeaponViewModel>(fPSWeapon, BulletFired);
     }
     
     public override ViewModel CreateEmpty() {
@@ -278,6 +282,9 @@ public abstract class FPSWeaponControllerBase : Controller {
     }
     
     public virtual void EndFire(FPSWeaponViewModel fPSWeapon) {
+    }
+    
+    public virtual void BulletFired(FPSWeaponViewModel fPSWeapon) {
     }
 }
 
@@ -364,6 +371,7 @@ public abstract class DeathMatchGameControllerBase : FPSGameController {
     }
     
     public override void Initialize(ViewModel viewModel) {
+        base.Initialize(viewModel);
         this.InitializeDeathMatchGame(((DeathMatchGameViewModel)(viewModel)));
     }
 }

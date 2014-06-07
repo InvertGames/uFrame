@@ -115,8 +115,8 @@
     <Compile Include="VariableDrawer.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\UBehaviours\Invert.uBehaviours.csproj">
-      <Project>{A0448E5C-C0A6-40CA-8C82-BDD4472B5E62}</Project>
+    <ProjectReference Include="..\Invert.uBehaviours\Invert.uBehaviours.csproj">
+      <Project>{a0448e5c-c0a6-40ca-8c82-bdd4472b5e62}</Project>
       <Name>Invert.uBehaviours</Name>
     </ProjectReference>
   </ItemGroup>

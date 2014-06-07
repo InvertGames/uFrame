@@ -60,6 +60,27 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\CarExample\CarExample.designer.cs" />
+    <Compile Include="Assets\CarExample\CarExampleControllers.designer.cs" />
+    <Compile Include="Assets\CarExample\CarExampleViews.designer.cs" />
+    <Compile Include="Assets\CarExample\Controllers\ElementAController.cs" />
+    <Compile Include="Assets\CarExample\Controllers\ElementBController.cs" />
+    <Compile Include="Assets\CarExample\Controllers\GameController.cs" />
+    <Compile Include="Assets\CarExample\Controllers\GamePlayerController.cs" />
+    <Compile Include="Assets\CarExample\SceneManagers\NewSceneManager.cs" />
+    <Compile Include="Assets\CarExample\SceneManagers\NewSceneManager1.cs" />
+    <Compile Include="Assets\CarExample\SceneManagers\NewSceneManager1Settings.cs" />
+    <Compile Include="Assets\CarExample\SceneManagers\NewSceneManagerSettings.cs" />
+    <Compile Include="Assets\CarExample\ViewModels\ElementAViewModel.cs" />
+    <Compile Include="Assets\CarExample\ViewModels\ElementBViewModel.cs" />
+    <Compile Include="Assets\CarExample\ViewModels\GamePlayerViewModel.cs" />
+    <Compile Include="Assets\CarExample\ViewModels\GameViewModel.cs" />
+    <Compile Include="Assets\CarExample\Views\ElementAView.cs" />
+    <Compile Include="Assets\CarExample\Views\ElementBView.cs" />
+    <Compile Include="Assets\CarExample\Views\ElementBViewFromA.cs" />
+    <Compile Include="Assets\CarExample\Views\NewView.cs" />
+    <Compile Include="Assets\CarExample\Views\NewView1.cs" />
+    <Compile Include="Assets\CarExample\Views\NewView2.cs" />
     <Compile Include="Assets\PrivateStuff\AssetStoreStuff\WebTutorials\Views.cs" />
     <Compile Include="Assets\PrivateStuff\Daikon Forge\DataBinding\Scripts\dfComponentMemberInfo.cs" />
     <Compile Include="Assets\PrivateStuff\Daikon Forge\DataBinding\Scripts\dfControlKeyBinding.cs" />
@@ -225,15 +246,6 @@
     <Compile Include="Assets\PrivateStuff\Daikon Forge\Tweening\Scripts\dfTweenVector2.cs" />
     <Compile Include="Assets\PrivateStuff\Daikon Forge\Tweening\Scripts\dfTweenVector3.cs" />
     <Compile Include="Assets\PrivateStuff\Daikon Forge\Tweening\Scripts\dfTweenVector4.cs" />
-    <Compile Include="Assets\PrivateStuff\DiagramTests\Controllers\asdfasdfController.cs" />
-    <Compile Include="Assets\PrivateStuff\DiagramTests\Controllers\BLABLAController.cs" />
-    <Compile Include="Assets\PrivateStuff\DiagramTests\DiagramTests.designer.cs" />
-    <Compile Include="Assets\PrivateStuff\DiagramTests\DiagramTestsControllers.designer.cs" />
-    <Compile Include="Assets\PrivateStuff\DiagramTests\DiagramTestsViews.designer.cs" />
-    <Compile Include="Assets\PrivateStuff\DiagramTests\SceneManagers\TestGameScene.cs" />
-    <Compile Include="Assets\PrivateStuff\DiagramTests\ViewModels\asdfasdfViewModel.cs" />
-    <Compile Include="Assets\PrivateStuff\DiagramTests\ViewModels\BLABLAViewModel.cs" />
-    <Compile Include="Assets\PrivateStuff\DiagramTests\Views\NewView.cs" />
     <Compile Include="Assets\PrivateStuff\Extras\Bugs.cs" />
     <Compile Include="Assets\PrivateStuff\Extras\VariableWind.cs" />
     <Compile Include="Assets\PrivateStuff\NGUI\Examples\Scripts\InventorySystem\Game\EquipItems.cs" />
@@ -2389,6 +2401,7 @@
     <Compile Include="Assets\uFrameComplete\uFrame\Examples\FPSShooter\Components\FPSCrosshair.cs" />
     <Compile Include="Assets\uFrameComplete\uFrame\Examples\FPSShooter\Components\FPSMapCamera.cs" />
     <Compile Include="Assets\uFrameComplete\uFrame\Examples\FPSShooter\Components\MouseLook.cs" />
+    <Compile Include="Assets\uFrameComplete\uFrame\Examples\FPSShooter\Components\RapidFire.cs" />
     <Compile Include="Assets\uFrameComplete\uFrame\Examples\FPSShooter\Components\RocketLauncher.cs" />
     <Compile Include="Assets\uFrameComplete\uFrame\Examples\FPSShooter\Controllers\DeathMatchGameController.cs" />
     <Compile Include="Assets\uFrameComplete\uFrame\Examples\FPSShooter\Controllers\FPSBulletController.cs" />
@@ -2431,7 +2444,6 @@
     <Compile Include="Assets\uFrameComplete\uFrame\Examples\FPSShooter\Views\FPSWeaponFire.cs" />
     <Compile Include="Assets\uFrameComplete\uFrame\Examples\FPSShooter\Views\FPSWeaponView.cs" />
     <Compile Include="Assets\uFrameComplete\uFrame\Examples\FPSShooter\Views\HUDPlayerView.cs" />
-    <Compile Include="Assets\uFrameComplete\uFrame\Examples\FPSShooter\Views\NewView1.cs" />
     <Compile Include="Assets\uFrameComplete\uFrame\Examples\FPSShooter\Views\WavesFPSHudView.cs" />
     <Compile Include="Assets\uFrameComplete\uFrame\Examples\FPSShooter\Views\WavesHudView.cs" />
     <Compile Include="Assets\uFrameComplete\uFrame\Examples\GUIExample(NGUI&amp;DF Only)\Controllers\GUIGameController.cs" />
@@ -2458,6 +2470,8 @@
     <Compile Include="Assets\uFrameComplete\uFrame\Examples\Transitions\SceneManagers\IntroductionSceneManager.cs" />
     <Compile Include="Assets\uFrameComplete\uFrame\Examples\Transitions\ViewModels\IntroductionGameViewModel.cs" />
     <Compile Include="Assets\uFrameComplete\uFrame\Examples\Transitions\ViewModels\IntroductionMenuScreenViewModel.cs" />
+    <Compile Include="Assets\uFrameComplete\uFrame\Examples\Transitions\ViewModels\MenuElementViewModel.cs" />
+    <Compile Include="Assets\uFrameComplete\uFrame\Examples\Transitions\ViewModels\MyGameElementViewModel.cs" />
     <Compile Include="Assets\uFrameComplete\uFrame\Examples\Transitions\Views\IntroductionMenuView.cs" />
     <Compile Include="Assets\uFrameComplete\uFrameBehaviours\Actions\Event.cs" />
     <Compile Include="Assets\uFrameComplete\uFrameBehaviours\Actions\ExecuteCommand.cs" />

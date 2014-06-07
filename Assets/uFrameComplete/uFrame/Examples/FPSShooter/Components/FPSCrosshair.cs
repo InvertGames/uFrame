@@ -8,6 +8,12 @@ using UnityEngine;
 public partial class FPSCrosshair {
     public Texture2D _CrossHairTexture;
     public float _CrossHairScale;
+    private FPSWeaponFire _weaponFire;
+
+    public FPSWeaponFire FPSWeaponFire
+    {
+        get { return _weaponFire ?? (_weaponFire = this.GetComponent<FPSWeaponFire>()); }
+    }
 
     public void ResetCrosshair()
     {
@@ -20,10 +26,10 @@ public partial class FPSCrosshair {
         if (FPSWeapon.State == FPSWeaponState.Reloading || FPSWeapon.State == FPSWeaponState.Empty) return;
 
         var textureWidth = Mathf.Max(
-            (_CrossHairTexture.width * _CrossHairScale) * FPSWeapon.Spread * 200f,
+            (_CrossHairTexture.width * _CrossHairScale) * FPSWeaponFire._Spread * 200f,
             _CrossHairTexture.width * _CrossHairScale);
         var textureHeight = Mathf.Max(
-            (_CrossHairTexture.height * _CrossHairScale) * FPSWeapon.Spread * 200f,
+            (_CrossHairTexture.height * _CrossHairScale) * FPSWeaponFire._Spread * 200f,
             _CrossHairTexture.height * _CrossHairScale);
 
         textureWidth = Math.Min(textureWidth, _CrossHairTexture.width);
