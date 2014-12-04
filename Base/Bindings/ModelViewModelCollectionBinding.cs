@@ -72,10 +72,10 @@ public class ModelCollectionBinding<TCollectionType> : Binding
 
     private void BindNow()
     {
-        CollectionOnChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, Collection.Cast<object>().ToArray()));
+        CollectionOnChanged(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, Collection.Cast<object>().ToArray()));
     }
 
-    private void CollectionOnChanged(NotifyCollectionChangedEventArgs changeArgs)
+    private void CollectionOnChanged(object sender, NotifyCollectionChangedEventArgs changeArgs)
     {
         if (changeArgs.NewItems != null)
             foreach (var newItem in changeArgs.NewItems)
@@ -259,13 +259,13 @@ public class ModelViewModelCollectionBinding : Binding
         Collection.CollectionChanged += CollectionOnChanged;
         if (!_viewFirst && IsImmediate)
         {
-            CollectionOnChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, List));
+            CollectionOnChanged(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, List));
         }
     }
 
     public ViewBase SourceView { get; set; }
 
-    private void CollectionOnChanged(NotifyCollectionChangedEventArgs changeArgs)
+    private void CollectionOnChanged(object sender, NotifyCollectionChangedEventArgs changeArgs)
     {
         if (changeArgs.Action == NotifyCollectionChangedAction.Reset)
         {

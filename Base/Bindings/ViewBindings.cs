@@ -43,7 +43,7 @@ public static class ViewBindings
     /// <returns>The binding class that allows chaining extra options.</returns>
     public static IDisposable BindCollection<TCollectionItemType>(this IBindable t, ObservableCollection<TCollectionItemType> collection, Action<TCollectionItemType> added, Action<TCollectionItemType> removed)
     {
-        NotifyCollectionChangedEventHandler collectionChanged = delegate(NotifyCollectionChangedEventArgs args)
+        NotifyCollectionChangedEventHandler collectionChanged = delegate(object sender, NotifyCollectionChangedEventArgs args)
          {
              if (added != null && args.NewItems != null)
                  foreach (var item in args.NewItems)
@@ -55,7 +55,7 @@ public static class ViewBindings
          };
 
         collection.CollectionChanged += collectionChanged;
-        collectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, collection.ToArray()));
+        collectionChanged(t, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, collection.ToArray()));
         return t.AddBinding(Disposable.Create(() => collection.CollectionChanged -= collectionChanged));
     }
 

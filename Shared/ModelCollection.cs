@@ -33,7 +33,7 @@ public class ModelCollection<T> : ObservableCollection<T>
 
     public IDisposable Subscribe(IObserver<NotifyCollectionChangedEventArgs> observer)
     {
-        NotifyCollectionChangedEventHandler evt = args => observer.OnNext(args);
+        NotifyCollectionChangedEventHandler evt = (object sender, NotifyCollectionChangedEventArgs args) => observer.OnNext(args);
             
         CollectionChanged += evt;
         return new SimpleDisposable(() => CollectionChanged -= evt);
