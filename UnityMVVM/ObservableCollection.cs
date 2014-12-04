@@ -1,199 +1,401 @@
-﻿// Permission is hereby granted, free of charge, to any person obtaining
-// a copy of this software and associated documentation files (the
-// "Software"), to deal in the Software without restriction, including
-// without limitation the rights to use, copy, modify, merge, publish,
-// distribute, sublicense, and/or sell copies of the Software, and to
-// permit persons to whom the Software is furnished to do so, subject to
-// the following conditions:
-// 
-// The above copyright notice and this permission notice shall be
-// included in all copies or substantial portions of the Software.
-// 
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
-// EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
-// NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
-// LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
-// OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
-// WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+//---------------------------------------------------------------------------
 //
-// Copyright (c) 2007 Novell, Inc. (http://www.novell.com)
+// <copyright file="ObservableCollection.cs" company="Microsoft">
+//    Copyright (C) 2003 by Microsoft Corporation.  All rights reserved.
+// </copyright>
 //
-// Authors:
-//	Chris Toshok (toshok@novell.com)
-//	Brian O'Keefe (zer0keefie@gmail.com)
 //
+// Description: Implementation of an Collection<T> implementing INotifyCollectionChanged
+//              to notify listeners of dynamic changes of the list.
+//
+// See spec at http://avalon/connecteddata/Specs/Collection%20Interfaces.mht
+//
+// History:
+//  11/22/2004 : [....] - created
+//
+//---------------------------------------------------------------------------
+
+// Adapted for Unity
+
+#if !NETFX_CORE
+
+using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.ComponentModel;
 
 namespace System.Collections.ObjectModel
 {
-#if DLL
-    [Serializable]
-    public class ModelCollection<T> : Collection<T>, INotifyCollectionChanged, INotifyPropertyChanged
-    {
-#else
-    [Serializable]
+    /// <summary>
+    /// Implementation of a dynamic data collection based on generic Collection&lt;T&gt;,
+    /// implementing INotifyCollectionChanged to notify listeners
+    /// when items get added, removed or the whole list is refreshed.
+    /// </summary>
     public class ObservableCollection<T> : Collection<T>, INotifyCollectionChanged, INotifyPropertyChanged
     {
-#endif
-  
-		[Serializable]
-		sealed class SimpleMonitor : IDisposable {
-			private int _busyCount;
+        //------------------------------------------------------
+        //
+        //  Constructors
+        //
+        //------------------------------------------------------
 
-			public SimpleMonitor()
-			{
-			}
+        #region Constructors
 
-			public void Enter()
-			{
-				_busyCount++;
-			}
+        /// <summary>
+        /// Initializes a new instance of ObservableCollection that is empty and has default initial capacity.
+        /// </summary>
+        public ObservableCollection()
+            : base()
+        {
+        }
 
-			public void Dispose()
-			{
-				_busyCount--;
-			}
+        /// <summary>
+        /// Initializes a new instance of the ObservableCollection class
+        /// that contains elements copied from the specified list
+        /// </summary>
+        /// <param name="list">The list whose elements are copied to the new list.</param>
+        /// <remarks>
+        /// The elements are copied onto the ObservableCollection in the
+        /// same order they are read by the enumerator of the list.
+        /// </remarks>
+        /// <exception cref="ArgumentNullException"> list is a null reference </exception>
+        public ObservableCollection(List<T> list)
+            : base((list != null) ? new List<T>(list.Count) : list)
+        {
+            // Workaround for VSWhidbey bug 562681 (tracked by Windows bug 1369339).
+            // We should be able to simply call the base(list) ctor.  But Collection<T>
+            // doesn't copy the list (contrary to the documentation) - it uses the
+            // list directly as its storage.  So we do the copying here.
+            //
+            CopyFrom(list);
+        }
 
-			public bool Busy
-			{
-				get { return _busyCount > 0; }
-			}
-		}
+        /// <summary>
+        /// Initializes a new instance of the ObservableCollection class that contains
+        /// elements copied from the specified collection and has sufficient capacity
+        /// to accommodate the number of elements copied.
+        /// </summary>
+        /// <param name="collection">The collection whose elements are copied to the new list.</param>
+        /// <remarks>
+        /// The elements are copied onto the ObservableCollection in the
+        /// same order they are read by the enumerator of the collection.
+        /// </remarks>
+        /// <exception cref="ArgumentNullException"> collection is a null reference </exception>
+        public ObservableCollection(IEnumerable<T> collection)
+        {
+            if (collection == null)
+                throw new ArgumentNullException("collection");
 
-		private SimpleMonitor _monitor = new SimpleMonitor ();
+            CopyFrom(collection);
+        }
 
-#if !DLL
-        public ObservableCollection ()
-		{
-            
-		}
+        private void CopyFrom(IEnumerable<T> collection)
+        {
+            IList<T> items = Items;
+            if (collection != null && items != null)
+            {
+                using (IEnumerator<T> enumerator = collection.GetEnumerator())
+                {
+                    while (enumerator.MoveNext())
+                    {
+                        items.Add(enumerator.Current);
+                    }
+                }
+            }
+        }
 
-		public ObservableCollection (IEnumerable<T> collection)
-		{
-			if (collection == null)
-				throw new ArgumentNullException ("collection");
+        #endregion Constructors
 
-			foreach (var item in collection)
-				Add (item);
-		}
+        //------------------------------------------------------
+        //
+        //  Public Methods
+        //
+        //------------------------------------------------------
 
-		public ObservableCollection (List<T> list)
-			: base (list != null ? new List<T> (list) : null)
-		{
-		}
-#endif
+        #region Public Methods
 
-		[field:NonSerialized]
-		public virtual event NotifyCollectionChangedEventHandler CollectionChanged;
-		[field:NonSerialized]
-		public virtual event PropertyChangedEventHandler PropertyChanged;
+        /// <summary>
+        /// Move item at oldIndex to newIndex.
+        /// </summary>
+        public void Move(int oldIndex, int newIndex)
+        {
+            MoveItem(oldIndex, newIndex);
+        }
 
-		event PropertyChangedEventHandler INotifyPropertyChanged.PropertyChanged {
-			add { this.PropertyChanged += value; }
-			remove { this.PropertyChanged -= value; }
-		}
+        #endregion Public Methods
 
-		protected IDisposable BlockReentrancy ()
-		{
-			_monitor.Enter ();
-			return _monitor;
-		}
+        //------------------------------------------------------
+        //
+        //  Public Events
+        //
+        //------------------------------------------------------
 
-		protected void CheckReentrancy ()
-		{
-			NotifyCollectionChangedEventHandler eh = CollectionChanged;
+        #region Public Events
 
-			// Only have a problem if we have more than one event listener.
-			if (_monitor.Busy && eh != null && eh.GetInvocationList ().Length > 1)
-				throw new InvalidOperationException ("Cannot modify the collection while reentrancy is blocked.");
-		}
+        //------------------------------------------------------
+        /// <summary>
+        /// PropertyChanged event (per <see cref="INotifyPropertyChanged" />).
+        /// </summary>
+        public virtual event PropertyChangedEventHandler PropertyChanged;
 
-		protected override void ClearItems ()
-		{
-			CheckReentrancy ();
+        //------------------------------------------------------
+        /// <summary>
+        /// Occurs when the collection changes, either by adding or removing an item.
+        /// </summary>
+        /// <remarks>
+        /// see <seealso cref="INotifyCollectionChanged"/>
+        /// </remarks>
+        public virtual event NotifyCollectionChangedEventHandler CollectionChanged;
 
-			base.ClearItems ();
+        #endregion Public Events
 
-			OnCollectionChanged (new NotifyCollectionChangedEventArgs (NotifyCollectionChangedAction.Reset));
-			OnPropertyChanged (new PropertyChangedEventArgs ("Count"));
-			OnPropertyChanged (new PropertyChangedEventArgs ("Item[]"));
-		}
+        //------------------------------------------------------
+        //
+        //  Protected Methods
+        //
+        //------------------------------------------------------
 
-		protected override void InsertItem (int index, T item)
-		{
-			CheckReentrancy ();
+        #region Protected Methods
 
-			base.InsertItem (index, item);
+        /// <summary>
+        /// Called by base class Collection&lt;T&gt; when the list is being cleared;
+        /// raises a CollectionChanged event to any listeners.
+        /// </summary>
+        protected override void ClearItems()
+        {
+            CheckReentrancy();
+            base.ClearItems();
+            OnPropertyChanged(CountString);
+            OnPropertyChanged(IndexerName);
+            OnCollectionReset();
+        }
 
-			OnCollectionChanged (new NotifyCollectionChangedEventArgs (NotifyCollectionChangedAction.Add, item, index));
-			OnPropertyChanged (new PropertyChangedEventArgs ("Count"));
-			OnPropertyChanged (new PropertyChangedEventArgs ("Item[]"));
-		}
+        /// <summary>
+        /// Called by base class Collection&lt;T&gt; when an item is removed from list;
+        /// raises a CollectionChanged event to any listeners.
+        /// </summary>
+        protected override void RemoveItem(int index)
+        {
+            CheckReentrancy();
+            T removedItem = this[index];
 
-		public void Move (int oldIndex, int newIndex)
-		{
-			MoveItem (oldIndex, newIndex);
-		}
+            base.RemoveItem(index);
 
-		protected virtual void MoveItem (int oldIndex, int newIndex)
-		{
-			CheckReentrancy ();
+            OnPropertyChanged(CountString);
+            OnPropertyChanged(IndexerName);
+            OnCollectionChanged(NotifyCollectionChangedAction.Remove, removedItem, index);
+        }
 
-			T item = this [oldIndex];
-			base.RemoveItem (oldIndex);
-			base.InsertItem (newIndex, item);
+        /// <summary>
+        /// Called by base class Collection&lt;T&gt; when an item is added to list;
+        /// raises a CollectionChanged event to any listeners.
+        /// </summary>
+        protected override void InsertItem(int index, T item)
+        {
+            CheckReentrancy();
+            base.InsertItem(index, item);
 
-			OnCollectionChanged (new NotifyCollectionChangedEventArgs (NotifyCollectionChangedAction.Move, item, newIndex, oldIndex));
-			OnPropertyChanged (new PropertyChangedEventArgs ("Item[]"));
-		}
+            OnPropertyChanged(CountString);
+            OnPropertyChanged(IndexerName);
+            OnCollectionChanged(NotifyCollectionChangedAction.Add, item, index);
+        }
 
-		protected virtual void OnCollectionChanged (NotifyCollectionChangedEventArgs e)
-		{
-			NotifyCollectionChangedEventHandler eh = CollectionChanged;
+        /// <summary>
+        /// Called by base class Collection&lt;T&gt; when an item is set in list;
+        /// raises a CollectionChanged event to any listeners.
+        /// </summary>
+        protected override void SetItem(int index, T item)
+        {
+            CheckReentrancy();
+            T originalItem = this[index];
+            base.SetItem(index, item);
 
-			if (eh != null) {
-				// Make sure that the invocation is done before the collection changes,
-				// Otherwise there's a chance of data corruption.
-				using (BlockReentrancy ()) {
-					eh (e);
-				}
-			}
-		}
+            OnPropertyChanged(IndexerName);
+            OnCollectionChanged(NotifyCollectionChangedAction.Replace, originalItem, item, index);
+        }
 
-		protected virtual void OnPropertyChanged (PropertyChangedEventArgs e)
-		{
-			PropertyChangedEventHandler eh = PropertyChanged;
+        /// <summary>
+        /// Called by base class ObservableCollection&lt;T&gt; when an item is to be moved within the list;
+        /// raises a CollectionChanged event to any listeners.
+        /// </summary>
+        protected virtual void MoveItem(int oldIndex, int newIndex)
+        {
+            CheckReentrancy();
 
-			if (eh != null)
-				eh (this, e);
-		}
+            T removedItem = this[oldIndex];
 
-		protected override void RemoveItem (int index)
-		{
-			CheckReentrancy ();
+            base.RemoveItem(oldIndex);
+            base.InsertItem(newIndex, removedItem);
 
-			T item = this [index];
+            OnPropertyChanged(IndexerName);
+            OnCollectionChanged(NotifyCollectionChangedAction.Move, removedItem, newIndex, oldIndex);
+        }
 
-			base.RemoveItem (index);
+        /// <summary>
+        /// Raises a PropertyChanged event (per <see cref="INotifyPropertyChanged" />).
+        /// </summary>
+        protected virtual void OnPropertyChanged(PropertyChangedEventArgs e)
+        {
+            if (PropertyChanged != null)
+            {
+                PropertyChanged(this, e);
+            }
+        }
 
-			OnCollectionChanged (new NotifyCollectionChangedEventArgs (NotifyCollectionChangedAction.Remove, item, index));
-			OnPropertyChanged (new PropertyChangedEventArgs ("Count"));
-			OnPropertyChanged (new PropertyChangedEventArgs ("Item[]"));
-		}
+        /// <summary>
+        /// Raise CollectionChanged event to any listeners.
+        /// Properties/methods modifying this ObservableCollection will raise
+        /// a collection changed event through this virtual method.
+        /// </summary>
+        /// <remarks>
+        /// When overriding this method, either call its base implementation
+        /// or call <see cref="BlockReentrancy"/> to guard against reentrant collection changes.
+        /// </remarks>
+        protected virtual void OnCollectionChanged(NotifyCollectionChangedEventArgs e)
+        {
+            if (CollectionChanged != null)
+            {
+                using (BlockReentrancy())
+                {
+                    CollectionChanged(this, e);
+                }
+            }
+        }
 
-		protected override void SetItem (int index, T item)
-		{
-			CheckReentrancy ();
+        /// <summary>
+        /// Disallow reentrant attempts to change this collection. E.g. a event handler
+        /// of the CollectionChanged event is not allowed to make changes to this collection.
+        /// </summary>
+        /// <remarks>
+        /// typical usage is to wrap e.g. a OnCollectionChanged call with a using() scope:
+        /// <code>
+        ///         using (BlockReentrancy())
+        ///         {
+        ///             CollectionChanged(this, new NotifyCollectionChangedEventArgs(action, item, index));
+        ///         }
+        /// </code>
+        /// </remarks>
+        protected IDisposable BlockReentrancy()
+        {
+            _monitor.Enter();
+            return _monitor;
+        }
 
-			T oldItem = this [index];
+        /// <summary> Check and assert for reentrant attempts to change this collection. </summary>
+        /// <exception cref="InvalidOperationException"> raised when changing the collection
+        /// while another collection change is still being notified to other listeners </exception>
+        protected void CheckReentrancy()
+        {
+            if (_monitor.Busy)
+            {
+                // we can allow changes if there's only one listener - the problem
+                // only arises if reentrant changes make the original event args
+                // invalid for later listeners.  This keeps existing code working
+                // (e.g. Selector.SelectedItems).
+                if ((CollectionChanged != null) && (CollectionChanged.GetInvocationList().Length > 1))
+                    throw new InvalidOperationException("Cannot modify the collection while reentrancy is blocked.");
+            }
+        }
 
-			base.SetItem (index, item);
+        #endregion Protected Methods
 
-			OnCollectionChanged (new NotifyCollectionChangedEventArgs (NotifyCollectionChangedAction.Replace, item, oldItem, index));
-			OnPropertyChanged (new PropertyChangedEventArgs ("Item[]"));
-		}
-	}
+        //------------------------------------------------------
+        //
+        //  Private Methods
+        //
+        //------------------------------------------------------
+
+        #region Private Methods
+
+        /// <summary>
+        /// Helper to raise a PropertyChanged event  />).
+        /// </summary>
+        private void OnPropertyChanged(string propertyName)
+        {
+            OnPropertyChanged(new PropertyChangedEventArgs(propertyName));
+        }
+
+        /// <summary>
+        /// Helper to raise CollectionChanged event to any listeners
+        /// </summary>
+        private void OnCollectionChanged(NotifyCollectionChangedAction action, object item, int index)
+        {
+            OnCollectionChanged(new NotifyCollectionChangedEventArgs(action, item, index));
+        }
+
+        /// <summary>
+        /// Helper to raise CollectionChanged event to any listeners
+        /// </summary>
+        private void OnCollectionChanged(NotifyCollectionChangedAction action, object item, int index, int oldIndex)
+        {
+            OnCollectionChanged(new NotifyCollectionChangedEventArgs(action, item, index, oldIndex));
+        }
+
+        /// <summary>
+        /// Helper to raise CollectionChanged event to any listeners
+        /// </summary>
+        private void OnCollectionChanged(NotifyCollectionChangedAction action, object oldItem, object newItem, int index)
+        {
+            OnCollectionChanged(new NotifyCollectionChangedEventArgs(action, newItem, oldItem, index));
+        }
+
+        /// <summary>
+        /// Helper to raise CollectionChanged event with action == Reset to any listeners
+        /// </summary>
+        private void OnCollectionReset()
+        {
+            OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
+        }
+
+        #endregion Private Methods
+
+        //------------------------------------------------------
+        //
+        //  Private Types
+        //
+        //------------------------------------------------------
+
+        #region Private Types
+
+        // this class helps prevent reentrant calls
+        private class SimpleMonitor : IDisposable
+        {
+            public void Enter()
+            {
+                ++_busyCount;
+            }
+
+            public void Dispose()
+            {
+                --_busyCount;
+            }
+
+            public bool Busy { get { return _busyCount > 0; } }
+
+            private int _busyCount;
+        }
+
+        #endregion Private Types
+
+        //------------------------------------------------------
+        //
+        //  Private Fields
+        //
+        //------------------------------------------------------
+
+        #region Private Fields
+
+        private const string CountString = "Count";
+
+        // This must agree with Binding.IndexerName.  It is declared separately
+        // here so as to avoid a dependency on PresentationFramework.dll.
+        private const string IndexerName = "Item[]";
+
+        private SimpleMonitor _monitor = new SimpleMonitor();
+
+        #endregion Private Fields
+    }
 }
+
+#endif
