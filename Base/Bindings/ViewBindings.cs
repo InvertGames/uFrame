@@ -238,7 +238,7 @@ public static class ViewBindings
     /// <param name="commandSelector">The command to bind the input to</param>
     /// <param name="buttonName">The name of the input button to bind to.</param>
     /// <returns>The binding class that allows chaining extra options.</returns>
-    public static IDisposable BindInputButton(this ViewBase t, ICommand commandSelector, string buttonName, InputButtonEventType buttonEventType = InputButtonEventType.ButtonDown)
+    public static IDisposable BindInputButton(this ViewBase t, IuFrameCommand commandSelector, string buttonName, InputButtonEventType buttonEventType = InputButtonEventType.ButtonDown)
     {
         if (buttonEventType == InputButtonEventType.Button)
         {
@@ -259,7 +259,7 @@ public static class ViewBindings
     /// <param name="commandSelector"></param>
     /// <param name="key"></param>
     /// <returns>The binding class that allows chaining extra options.</returns>
-    public static IDisposable BindKey(this ViewBase t, ICommand commandSelector, KeyCode key, object parameter = null)
+    public static IDisposable BindKey(this ViewBase t, IuFrameCommand commandSelector, KeyCode key, object parameter = null)
     {
         return t.AddBinding(t.UpdateAsObservable().Where(p => Input.GetKey(key)).Subscribe(_ => t.ExecuteCommand(commandSelector, parameter)));
     }
@@ -374,7 +374,7 @@ public static class ViewBindings
     /// <param name="sourceCommand"></param>
     /// <param name="onExecuted"></param>
     /// <returns></returns>
-    public static IDisposable BindCommandExecuted(this IBindable bindable, ICommand sourceCommand, Action onExecuted)
+    public static IDisposable BindCommandExecuted(this IBindable bindable, IuFrameCommand sourceCommand, Action onExecuted)
     {
         return bindable.AddBinding(sourceCommand.Subscribe(delegate { onExecuted(); }));
     }

@@ -432,7 +432,7 @@ public abstract class ViewBase : ViewContainer, IUFSerializable, IBindable
     /// view-model of this view) this method can be used. e.g. ExecuteCommand(command, argument)</summary>
     /// <param name="command">The command to execute e.g. MyGameViewModel.MainMenuCommand</param>
     /// <param name="argument">The argument to pass along if needed.</param>
-    public void ExecuteCommand(ICommand command, object argument)
+    public void ExecuteCommand(IuFrameCommand command, object argument)
     {
         GameManager.CommandDispatcher.ExecuteCommand(command, argument);
     }
@@ -443,7 +443,7 @@ public abstract class ViewBase : ViewContainer, IUFSerializable, IBindable
     /// method can be used. e.g. ExecuteCommand(MyGameViewModel.MainMenuCommand)
     /// </summary>
     /// <param name="command">The command to execute e.g. MyGameViewModel.MainMenuCommand</param>
-    public virtual void ExecuteCommand(ICommand command)
+    public virtual void ExecuteCommand(IuFrameCommand command)
     {
         GameManager.CommandDispatcher.ExecuteCommand(command, null);
     }

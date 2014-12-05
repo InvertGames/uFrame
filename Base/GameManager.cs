@@ -497,7 +497,7 @@ public class GameManager : MonoBehaviour, ICommandDispatcher
         ActiveSceneManager.OnLoaded();
     }
 
-    public void ExecuteCommand(ICommand command, object argument, bool isChained = false)
+    public void ExecuteCommand(IuFrameCommand command, object argument, bool isChained = false)
     {
         command.Execute(argument);
         if (_commandsAsObservable != null)

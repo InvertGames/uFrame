@@ -162,6 +162,8 @@ public abstract class CommandBase<TArgument> : ICommandWith<TArgument>
     }
 
     public object Parameter { get; set; }
+
+    public event EventHandler CanExecuteChanged = delegate { };
 }
 
 [Obsolete]

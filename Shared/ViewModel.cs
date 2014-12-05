@@ -27,7 +27,7 @@ public abstract class ViewModel
     public bool Dirty { get; set; }
     public event PropertyChangedEventHandler PropertyChanged;
     private Dictionary<int, List<IDisposable>> _bindings;
-    private Dictionary<string, ICommand> _commands;
+    private Dictionary<string, IuFrameCommand> _commands;
     private Controller _controller;
     private List<ViewModelPropertyInfo> _modelProperties;
     private string _identifier;
@@ -76,7 +76,7 @@ public abstract class ViewModel
     }
 
     [Obsolete("Use GetViewModelCommands")]
-    public Dictionary<string, ICommand> Commands
+    public Dictionary<string, IuFrameCommand> Commands
     {
         get
         {
@@ -87,9 +87,9 @@ public abstract class ViewModel
             }
             if (_commands == null)
             {
-                var dictionary = new Dictionary<string, ICommand>();
+                var dictionary = new Dictionary<string, IuFrameCommand>();
                 foreach (KeyValuePair<string, PropertyInfo> command in GetReflectedCommands(this.GetType()))
-                    dictionary.Add(command.Key, (ICommand)command.Value.GetValue(this, null));
+                    dictionary.Add(command.Key, (IuFrameCommand)command.Value.GetValue(this, null));
                 _commands = dictionary;
             }
             return _commands;
@@ -157,7 +157,7 @@ public abstract class ViewModel
         var fields = modelType.GetProperties();
         foreach (var field in fields)
         {
-            if (typeof(ICommand).IsAssignableFrom(field.PropertyType))
+            if (typeof(IuFrameCommand).IsAssignableFrom(field.PropertyType))
             {
                 modelProperties.Add(field.Name, field);
             }
@@ -256,13 +256,13 @@ public abstract class ViewModel
     }
 
     [Obsolete]
-    protected ICommand Command(Action command)
+    protected IuFrameCommand Command(Action command)
     {
         return new Command(command);
     }
 
     [Obsolete]
-    protected ICommand Command(Func<IEnumerator> command)
+    protected IuFrameCommand Command(Func<IEnumerator> command)
     {
         return new YieldCommand(command);
     }
@@ -329,19 +329,19 @@ public abstract class ViewModel
 
 public class ViewModelCommandInfo
 {
-    public ICommand Command { get; set; }
+    public IuFrameCommand Command { get; set; }
 
     public string Name { get; set; }
 
     public Type ParameterType { get; set; }
 
-    public ViewModelCommandInfo(string name, ICommand command)
+    public ViewModelCommandInfo(string name, IuFrameCommand command)
     {
         Name = name;
         Command = command;
     }
 
-    public ViewModelCommandInfo(Type parameterType, string name, ICommand command)
+    public ViewModelCommandInfo(Type parameterType, string name, IuFrameCommand command)
     {
         ParameterType = parameterType;
         Name = name;

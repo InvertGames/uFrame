@@ -6,7 +6,7 @@ using UniRx;
 /// A ViewModel command that can be executed.
 /// IEnumerator is always used so that any command can be a coroutine.
 /// </summary>
-public class Command : ICommand
+public class Command : IuFrameCommand
 {
     public event CommandEvent OnCommandExecuted;
 
@@ -79,9 +79,11 @@ public class Command : ICommand
 
         return Disposable.Create(() => OnCommandExecuted -= handler);
     }
+
+    public event EventHandler CanExecuteChanged = delegate { };
 }
 [Obsolete("Yield commands are no longer used.")]
-public class YieldCommand : ICommand
+public class YieldCommand : IuFrameCommand
 {
     public event CommandEvent OnCommandExecuted;
 
@@ -157,4 +159,6 @@ public class YieldCommand : ICommand
 
         return Disposable.Create(() => OnCommandExecuted -= handler);
     }
+
+    public event EventHandler CanExecuteChanged = delegate { };
 }

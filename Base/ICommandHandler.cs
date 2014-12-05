@@ -2,18 +2,18 @@ using UniRx;
 
 public interface ICommandDispatcher : IObservable<CommandInfo>
 {
-    void ExecuteCommand(ICommand command, object argument, bool isChained = false);
+    void ExecuteCommand(IuFrameCommand command, object argument, bool isChained = false);
 }
 public class CommandInfo
 {
-    public CommandInfo(ICommand command, object argument, bool isChained)
+    public CommandInfo(IuFrameCommand command, object argument, bool isChained)
     {
         Command = command;
         Argument = argument;
         IsChained = isChained;
     }
 
-    public ICommand Command { get; set; }
+    public IuFrameCommand Command { get; set; }
     public object Argument { get; set; }
     public bool IsChained { get; set; }
 }

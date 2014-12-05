@@ -12,7 +12,7 @@ public delegate void CommandEvent();
 /// <summary>
 /// The base command interface for implementing a command in a ViewModel
 /// </summary>
-public interface ICommand : ISubject<Unit>
+public interface IuFrameCommand : ISubject<Unit>, System.Windows.Input.ICommand
 {
    
    
@@ -24,11 +24,9 @@ public interface ICommand : ISubject<Unit>
     //object Parameter { get; set; }
     
     //void Execute();
-    void Execute(object parameter);
-    bool CanExecute(object parameter);
 }
 
-public interface IParameterCommand : ICommand
+public interface IParameterCommand : IuFrameCommand
 {
     object Parameter { get; set; }
 }

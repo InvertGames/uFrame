@@ -164,7 +164,7 @@ public class UFrameEditorPlugin : DiagramPlugin
 
         public Type ICommand
         {
-            get { return typeof(ICommand); }
+            get { return typeof(IuFrameCommand); }
         }
 
         public Type ListOfViewModel

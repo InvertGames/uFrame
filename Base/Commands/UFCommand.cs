@@ -63,4 +63,6 @@ public abstract class UFCommand<T> : ICommandWith<T>
     {
         return true;
     }
+
+    public event EventHandler CanExecuteChanged = delegate { };
 }

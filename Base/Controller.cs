@@ -120,12 +120,12 @@ public abstract class Controller
     }
 
 
-    public void ExecuteCommand(ICommand command, object argument)
+    public void ExecuteCommand(IuFrameCommand command, object argument)
     {
         CommandDispatcher.ExecuteCommand(command, argument);
     }
 
-    public virtual void ExecuteCommand(ICommand command)
+    public virtual void ExecuteCommand(IuFrameCommand command)
     {
         CommandDispatcher.ExecuteCommand(command, null);
     }
@@ -167,7 +167,7 @@ public abstract class Controller
         return null;
     }
 
-    protected void SubscribeToCommand(ICommand command, Action action)
+    protected void SubscribeToCommand(IuFrameCommand command, Action action)
     {
         command.OnCommandExecuted += () => action();
 

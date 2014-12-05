@@ -92,6 +92,8 @@ public class YieldCommandWith<T> : ICommandWith<T>
 
         return Disposable.Create(() => OnCommandExecuted -= handler);
     }
+
+    public event EventHandler CanExecuteChanged = delegate { };
 }
 /// <summary>
 /// A coroutine command with a parameter.
@@ -186,6 +188,8 @@ public class YieldCommandWithSender<T> : ICommandWith<T>
 
         return Disposable.Create(() => OnCommandExecuted -= handler);
     }
+
+    public event EventHandler CanExecuteChanged = delegate { };
 }
 
 /// <summary>
@@ -279,4 +283,6 @@ public class YieldCommandWithSenderAndArgument<TSender, TArgument> : ICommandWit
 
         return Disposable.Create(() => OnCommandExecuted -= handler);
     }
+
+    public event EventHandler CanExecuteChanged = delegate { };
 }
