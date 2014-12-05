@@ -233,7 +233,7 @@ public abstract class ViewModel
     public virtual void OnPropertyChanged(object sender, string propertyName)
     {
         PropertyChangedEventHandler handler = PropertyChanged;
-        if (handler != null) handler(sender, new PropertyChangedEventArgs(propertyName));
+        if (handler != null) handler(this, new PropertyChangedEventArgs(propertyName));
     }
 
 #if !DLL
