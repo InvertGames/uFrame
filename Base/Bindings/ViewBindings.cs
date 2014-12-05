@@ -56,7 +56,12 @@ public static class ViewBindings
 
         collection.CollectionChanged += collectionChanged;
         collectionChanged(t, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, collection.ToArray()));
-        return t.AddBinding(Disposable.Create(() => collection.CollectionChanged -= collectionChanged));
+        return t.AddBinding(Disposable.Create(() => UnbindCollectionChanged(collection, collectionChanged)));
+    }
+
+    private static void UnbindCollectionChanged<t>(ObservableCollection<t> collection, NotifyCollectionChangedEventHandler collectionChanged)
+    {
+        collection.CollectionChanged -= collectionChanged;
     }
 
     /// <summary>
