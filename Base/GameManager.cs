@@ -46,6 +46,50 @@ public class GameManager : MonoBehaviour, ICommandDispatcher
     private List<SceneManager> _sceneManagers = new List<SceneManager>();
     private SimpleSubject<CommandInfo> _commandsAsObservable;
 
+    #region Render Settings
+
+    [SerializeField, HideInInspector]
+    private bool _Fog;
+    [SerializeField, HideInInspector]
+    private Color _FogColor;
+    [SerializeField, HideInInspector]
+    private FogMode _FogMode;
+    [SerializeField, HideInInspector]
+    private float _FogDensity;
+    [SerializeField, HideInInspector]
+    private float _LinearFogStart;
+    [SerializeField, HideInInspector]
+    private float _LinearFogEnd;
+    [SerializeField, HideInInspector]
+    private Color _AmbientLight;
+    [SerializeField, HideInInspector]
+    private float _HaloStrength;
+    [SerializeField, HideInInspector]
+    private float _FlareStrength;
+    [SerializeField,HideInInspector]
+    private Material _SkyboxMaterial;
+
+
+    public void ApplyRenderSettings()
+    {
+        RenderSettings.fog = _Fog;
+        RenderSettings.fogColor = _FogColor;
+        RenderSettings.fogMode = _FogMode;
+        RenderSettings.fogDensity = _FogDensity;
+
+        RenderSettings.fogStartDistance = _LinearFogStart;
+        RenderSettings.fogEndDistance = _LinearFogEnd;
+
+        RenderSettings.ambientLight = _AmbientLight;
+        RenderSettings.skybox = _SkyboxMaterial;
+
+        RenderSettings.haloStrength = _HaloStrength;
+
+        RenderSettings.flareStrength = _FlareStrength;
+    }
+
+    #endregion
+
     public void Reset()
     {
         if (this.gameObject.GetComponent<MainThreadDispatcher>() == null)
@@ -305,7 +349,7 @@ public class GameManager : MonoBehaviour, ICommandDispatcher
 
         if (ActiveSceneManager != null)
         {
-            ActiveSceneManager.Unload();
+            //ActiveSceneManager.Unload();
             ActiveSceneManager.enabled = false;
             ActiveSceneManager.gameObject.SetActive(false);
             Log("Deactivated old scene manager.");
@@ -375,6 +419,8 @@ public class GameManager : MonoBehaviour, ICommandDispatcher
     /// </summary>
     public void Awake()
     {
+        ApplyRenderSettings();
+
         if (Instance != null)
         {
             // If the instace already exist destroy this
@@ -515,5 +561,26 @@ public class GameManager : MonoBehaviour, ICommandDispatcher
     public IDisposable Subscribe(IObserver<CommandInfo> observer)
     {
         return CommandsAsObservable.Subscribe(observer);
+    }
+
+    /// <summary>
+    /// Loads the current render settings of a scene.
+    /// </summary>
+    public void LoadRenderSettings()
+    {
+        _Fog = RenderSettings.fog;
+        _FogColor = RenderSettings.fogColor;
+        _FogMode = RenderSettings.fogMode;
+        _FogDensity = RenderSettings.fogDensity;
+
+        _LinearFogStart = RenderSettings.fogStartDistance;
+        _LinearFogEnd = RenderSettings.fogEndDistance;
+
+        _AmbientLight = RenderSettings.ambientLight;
+        _SkyboxMaterial = RenderSettings.skybox;
+
+        _HaloStrength = RenderSettings.haloStrength;
+
+        _FlareStrength = RenderSettings.flareStrength;
     }
 }

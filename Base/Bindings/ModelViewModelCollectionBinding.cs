@@ -297,7 +297,11 @@ public class ModelViewModelCollectionBinding : Binding
                 if (view != null)
                 {
                     AddLookup(view.gameObject, item as ViewModel);
+#if (UNITY_4_6 || UNITY_5_0)
+                    view.transform.SetParent(targetTransform, false);
+#else
                     view.transform.parent = targetTransform;
+#endif
                     if (OnAddView != null)
                     {
                         OnAddView(view);

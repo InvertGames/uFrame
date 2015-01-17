@@ -255,16 +255,18 @@ public abstract class ViewBase : ViewContainer, IUFSerializable, IBindable
 
             if (_parentView == null)
             {
-                //var parentView = transform.parent;
-                //while (parentView != null)
-                //{
-
-                //    if (parentView == null)
-                //        parentView = parentView.parent;
-                //}
-                if (transform == null) return null;
-                if (transform.parent == null) return null;
-                _parentView = transform.parent.GetView();
+                var parent = this.transform.parent;
+                if (parent == null) return null;
+                while (parent != null)
+                {
+                    var view = parent.GetView();
+                    if (view != null)
+                    {
+                        _parentView = view;
+                        break;
+                    }
+                    parent = parent.parent;
+                }
             }
             return _parentView;
         }
@@ -598,6 +600,7 @@ public abstract class ViewBase : ViewContainer, IUFSerializable, IBindable
 
         if (ViewModelObject == null)
             _Model = CreateModel();
+
         // If its instantiated then we dont want to recall
         // the bindings init because instantiate does that already
         if (Instantiated) return;

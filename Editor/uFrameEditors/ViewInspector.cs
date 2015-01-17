@@ -302,11 +302,11 @@ public class ViewInspector : uFrameInspector
             Info("The name that is used to share this instance among others (if any).");
 
             EditorGUILayout.PropertyField(resolveNameProperty, new GUIContent("Resolve Name"));
-            if (!t.IsMultiInstance && !string.IsNullOrEmpty(resolveNameProperty.stringValue))
-            {
-                Warning(
-                    "When using a 'ResolveName' on a single instance element, the element must be initialized manually in the scene manager's setup method.");
-            }
+            //if (!t.IsMultiInstance && !string.IsNullOrEmpty(resolveNameProperty.stringValue))
+            //{
+            //    Warning(
+            //        "When using a 'ResolveName' on a single instance element, the element must be initialized manually in the scene manager's setup method.");
+            //}
         }
 
 

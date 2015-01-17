@@ -141,9 +141,13 @@ public static class ViewExtensions
         {
             view.Identifier = model.Identifier;
         }
-
+#if (UNITY_4_6 || UNITY_5_0)
+        view.transform.SetParent(parent,false);
+#else
         view.transform.parent = parent;
-        view.ParentView = parent.GetView();
+#endif
+        // Pre cache the parent view
+        view.ParentView = view.ParentView;
         view.ViewName = name;
 
         if (model != null)

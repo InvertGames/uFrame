@@ -1,13 +1,31 @@
 [u]Frame Release Notes
 Be sure to subscribe to our newsletter @ invertgamestudios.com for updates, notifications, and cool info.
-1.5
-
-Overview
-
-uFrame 1.5 is out. Even thought is a minor version step, there are a lot of new exciting features,
- changes and bugfixes. This version addresses almost all of the issues in 1.4. Let's see what's new:
 
 Editor and Project:
+1.5.1
+Lots of bug fixes
+Fixed: Unity-5 Fix: Deprecated WWW call in UniRx throws Exception on Unity 5
+Fixed: Renaming .asset file for external graphs doesn't rename the node itself
+Fixed: (Render Settings on GameManager is back) Render Settings from target scene are not applied due to LoadLevelAdditive in LevelLoaderView 
+Fixed: Situational: SetupBindings() not called for all Views
+Fixed: Create{Element}View binding will generate the same return statement twice.
+Fixed: Double-click on main node of external graph: InvalidOperationException: Operation is not valid due to the current state of the object
+Fixed: No default state for the statemachine results into broken inspector.
+Fixed: "Generate Comments" toggle on ProjectRepository doesn't work ( Removed it, will be back in a future version)
+Fixed: Need way to order the Instantiation of ViewModels defined as Instances. ( Right-click move-up/down)
+Fixed: Instantiating Prefab with a 4.6 UI RectTransform causes warning about possible scale issues, when it sets the parent transform.
+Fixed: Scene Manager Unloaded Method is called twice
+Fixed: .Remove() on a collection item deletes references to parent elements
+Fixed: Inherited views creating duplicate initialize fields causing "Hides Inheirted member" error.
+Fixed: When views are instantiated from prefabs there is a strange bug that happens only when the game is ran for the second (or higher) time. uFrame doesn't initialize VM properties correctly then, instead views are created with default values (nulls).
+Fixed: Remove generated RequireComponent(typeof(MyViewComponent)) from Views.designer.cs
+Fixed: uFrame GameManager will always return null ActiveSceneManager on Unity4.6b21, causing uFrame to be useless.
+Fixed: If a computed property doesn't have any child properties, it wouldn't setup the dependant for the property.
+Fixed: ParentView on a view now searches up the transform tree to find the nearest parent view
+
+1.5
+uFrame 1.5 is out. Even thought is a minor version step, there are a lot of new exciting features,
+ changes and bugfixes. This version addresses almost all of the issues in 1.4. Let's see what's new:
 
 1.5 brings a completely new theme, with new cool UI features that make editor more responsive.
  Not only it looks more professional, but the usability is greatly improved, for example
@@ -140,211 +158,6 @@ Change: View-Models now contain a reference to a controller. This removes the re
 Change: Moved Controller WireCommands to ViewModels
 Fix: When an element property is on a element with a short name the delete button can't be clicked.
 Fix: UnityVS plugin now uses "Visual Studio Tools/Generate Project Files"
-
-
-1.284 
-Fixed: Controller's ExecuteCommand method sending a null sender.  So multi-instance element didn't received the correct reference.
-
-
-1.283 7/13/2014
-Fixed: Undo not reload correctly
-Fixed: Enums Generating their own file.  (You may need to delete {EnumName}.designer.cs)
-
-1.282 7/12/2014
-Fixed: Duplicates on Undo
-Fixed: View Inheritance issues
-Feature: Property, Collection, & Command re-ordering.
-Added: Theme Updates
-Fixed: Links pointing an element now point to the top of the element rather than the middle.
-
-1.28 7/6/2014
-Feature: Playmaker Plugin
-Feature: Save diagrams as json
-Save the diagram as JSON format to support custom node plugins, better version control, and external export/import. User should be able to easily move from to the new format easily. Show a notification when diagram is loaded to convert. Will not destroy the current diagram.
-Added: Delete items with the delete key
-Fixed: When removing an Enum it doesn't remove the type from a property.
-Added: Major performance enhancemenets.
-Added: New Settings dialog for Diagrams
-Added: Command buttons to the View's Insepctor
-Fixed: Missing "Has Multiple Instances" on element right-click menu.
-Added: Subsystem Folder structure option. via Settings button in the Designer toolbar.
-
-1.26 6/20/2014
-Fixed: Annoying error when clicking add on a node that is not selected adds to the wrong element.
-Fixed: SceneManager Load method being invoked twice when switching scenes.
-Updated: When registering named viewmodels via "Force Resolve" it registers for the type "ViewModel" and the actual instance type.
-Added: Plugin Manager to turn plugins on and off via the Top Menu Tools->uFrame->Plugins.
-Added: Default bindings for creating a custom loading screen.  Derive from LevelLoaderView and override StatusChanged, and ProgressChanged. (Tutorial coming soon.)
-Updated: Other minor optimizations and performance enhancements.
-
-1.25 6/15/2014
-Fixed: View Classes not working as expected
-Fixed: A small bug in ViewBase class.
-Updated: Inspector titlebar for inspectors.
-Change: You now have to set the start scenemanager in the game manager.
-Added: A new NGUI demo project showing of Templates, and Setting a View Base class.
-Fixed: Other small bugs
-
-1.2 6/12/2014
-Added/Fixed: Unity 4.5 Support
-Added: Diagram plugin support. Extend just about anything.  Look at (uFrameComplete/uFrame/Editor/DiagramPlugins) for details.
-Added: UnitVS plugin to auto sync project files on save.
-Added: "Template Elements" which makes them abstract. Right click an element and choose "Is Template";
-Added: View base class selection.  Just right-click a view and choose "View Base/{Name Of Base View}".
-Added: Command object model for plugins and easy feature additions.
-Added: Dependency injection class relationships.
-Added: Command hooks.  Now any command (Toolbar,ContextMenu) can be hooked to execute additional actions.
-Modified: Scene transitions to work better and play happy with Navigation system.
-Modified: Theme for a more polished look and feel.
-Modified: Dependency injection RegisterInstance has some reordered parameters to illeminate confusion and odd overloads.
-Modified: Dependency injection mappings. 
-Modified: File repositories to support future file formats such as json.
-Modified: View Inspector's play mode to show better results for element properties.  Still needs some polishing.
-Modified: Refactored code generation pieces to easily create plug-ins for third-party assets.
-Fixed: Major Performance enhancements.
-Fixed: Link colors being random colors. (Note diagram colors will reset)
-Fixed: Mac path problems causing annoying error messages.
-Fixed: Collapsing not refreshing the link positions.
-Fixed: A small bug in the controller where sometimes a Resolved ViewModel would return a new instance.
-Fixed: Recompiling makes the current diagram the current Unity selection.
-Fixed: Some small sizing issues.
-Fixed: Panning to the edge of the diagram caused selection to occur.
-
-1.06 5/10/2014
-Fixed: Heirarchy Icons going missing
-Fixed: When creating views that are not connected they won't be generated as an empty file.
-Fixed: You can't delete items that contain other items.  You must delete the "inner" items first.
-Fixed: When removing things it correctly removes the associations so that cascading errors don't occur. This includes Views still being generated
-Fixed: Add to scene on scene managers not working correctly
-Fixed: Some errors that occur from other non uFrame corrupted assets when polling for diagrams.
-Fixed: Other minor issues and fixes
-Modified: Now you can use ForceResolve directly from a view without manually adding the named injection.
-Modified: Controllers now have a GetByName and GetByType which can be overriden and are used by views.
-Modified: SceneManagers no longer initialize single instance types.  So a at least one view should check InitializeViewModel in the inspector
-
-1.04 5/4/2014
-IMPORTANT!!!: Since we re-released the source code you will need to reconnect all GameManagers in you're scene.
-IMPORTANT!!!: Make sure you delete the uFrameComplete folder then re-import.
-Note: Refactoring doesn't apply to changing type parameters on commands or enum items yet.
-Note: Now source code for uFrame is available again
-Added: New refactoring library added for renaming anything
-Added: New skin for a better look and feel
-Added: Panning via thie middle mouse button
-Added: Zooming (This will be improved in later builds)
-Modified: SceneManager Settings files are now partial so they can be extended.
-Modified: You no longer have to use shift for multi-selection.
-Fixed: A lot of ViewComponent link issues
-Fixed: Unity Free skin where things were hard to see
-Fixed: Where deleting a view wouldn't delete the view file
-Fixed: Collapsed states not being persisted correctly between sub diagrams
-Fixed: Switches to LoadLevelAdditive if you don't have a pro license.
-Fixed: iOS Mobile issues
-Fixed: Diagram Loading issues causing unity to crash or not able to load when Unity starts
-Fixed: Collapsing link issue
-
-1.0Beta 4/27/2014
-Added an all new element designer that generates SceneManagers(GameTypes), Controllers, ViewModels, Views, & View Components.
-Add a whole new action behaviour system called uBehaviours for quick one-off components.
-Integration of uBehaviours and the new diagram system.
-Rename GameType to SceneManager.
-Watch ViewModels from the inspector
-Initialize ViewModels from the inspector (Element Designer generates this)
-Automatic Bindings generation.
-Controllers have been removed from the scene the Element designer will automatically Dependency inject them.
-Simplified bindings via the Element Designer
-Updated Checkers Demo (To Demonstrate Diagrams and uBehaviours)
-Update FPS Demo
-Loading screen changed to just a view in a scene and nothing more.
-Dependency containers are no longer cleared when moving from scene to scene.
-Tons of other fixes and improvements.
-
-0.99r1 3/8/2014
-Added IBindingProvider interface so that other components can directly connect to a View Components Bind & Unbind methods.
-Removed the class constraints on Container.Resolve & Container.RegisterInstance.
-Add a User Submitted Cheat Sheet diagram.
-Other Minor Fixes/Improvements.
-
-0.99 2/4/2014
- Added A single ViewModel to View Binding via 
-	// View Class
-	public SingleView ChildView {get;set;}
-	// In Bind method
-	this.BindToView(() => Model._SingleViewModelProperty, v => ChildView = v, () => ChildView);
- Bug Fix: Now in objects where the Inject attribute is used and there isn't a registered instance it will keep the value at null.
- Important Note: Now when commands are Executed by default it passes the viewmodel along with it. 
-
-Used to look like this.-------------
-    public virtual TWeaponViewModel Create<TWeaponViewModel>() where TWeaponViewModel : FPSWeaponViewModel, new()
-    {
-        var fpsWeapon = new TWeaponViewModel();
-        fpsWeapon.NextZoomCommand = new CommandWith<FPSWeaponViewModel>(NextZoom);
-        fpsWeapon.FireCommand = new YieldCommandWith<FPSWE>(() =>
-        {
-            fpsWeapon.Spread += _SpreadMultiplier;
-
-            if (fpsWeapon.IsFiring)
-                return null;
-
-            return Fire(fpsWeapon);
-        });
-        fpsWeapon.RecoilAmount = _RecoilSpeed;
-        fpsWeapon.ReloadCommand = new YieldCommand(() => { return Reload(fpsWeapon); });
-        fpsWeapon.Spread = _Spread;
-        fpsWeapon.Ammo = _RoundSize * 3;
-        fpsWeapon.State = FPSWeaponState.Active;
-        return fpsWeapon;
-    }
-
-You can now do this--------------------------------------------------------------
-    public virtual TWeaponViewModel Create<TWeaponViewModel>() where TWeaponViewModel : FPSWeaponViewModel, new()
-    {
-        return new TWeaponViewModel
-        {
-            NextZoomCommand = new CommandWith<FPSWeaponViewModel>(NextZoom),
-            FireCommand = new YieldCommandWith<FPSWeaponViewModel>(FireWeapon),
-            RecoilAmount = _RecoilSpeed,
-            ReloadCommand = new YieldCommandWith<FPSWeaponViewModel>(Reload),
-            Spread = _Spread,
-            Ammo = _RoundSize*3,
-            State = FPSWeaponState.Active
-        };
-    }
-
-0.98r1 2/2/2014
-Bug Fix: Child Views will sometimes have a Model that is null causing an exception in Bind.
-Examples: Updated some example code on the FPS Game.
-
-0.98 2/1/2014
-Updated View Editor.
-Fixed Templates for SceneManager.
-Seperated templates for Generating a single file or generating multiple files via "New Element Structure" or "View Tools"
-Generating a View Prefab now automatically sets the "ViewModel From: to Controller and method that is generated.
-Fixed Window Hanging on Code Generation.
-Modified the Level Loading Algorithm to be more direct of the value passed in UpgradeProgressDelegate. (Thanks killamaaki)
-Fixed Controller Method Issue on Views where two Views in the scene caused a controller not to register.
-
-0.97 1/30/2014
-Minor Editor Bug Fixes
-
-0.96 1/29/2014
-InitializeModel method was renamed to InitializeViewModel ( BREAKING CHANGE APPLY RENAME WHERE USED! )
-Game class renamed to SceneManager ( Marked obsolete to not breaking anything )
-vmp snippet fixed and creates properties named _NameProperty now instead of _Name
-Added the ability to specify a controller & method that will be used to create a ViewModel when View's already exist in a scene.
-Fixed a GUI Styles Warning ( Thanks Shawn! )
-
-0.95 1/24/2014
-Added FPS Demo
-You can now use ExecuteCommand to execute commands with a parameter
-Added the ability to set parameters on command bindings.
-Added the ability for collision event bindings to be subscribed to with a GameObject as the parameter of the collider.
-Fixed Automatic controller injection where a controller that has multiple other controller properties being injected.
-
-0.92 1/19/2014
-	- Fixed a Property Binding Component where the Model Property wouldn't be set until the target component was set.
-
-0.9 1/12/2014
-	- Initial Release
 
 For Support Questions Contact:
 
