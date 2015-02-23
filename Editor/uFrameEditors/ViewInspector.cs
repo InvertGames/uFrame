@@ -315,10 +315,10 @@ public class ViewInspector : uFrameInspector
             "Should this field be saved and loaded when saving a scene's in-game state. e.g. GameManager.ActiveSceneManager.Load(...); GameManger.ActiveSceneManager.Save(...);");
         EditorGUILayout.PropertyField(saveProperty, new GUIContent("Save & Load"));
 
-        var injectProperty = serializedObject.FindProperty("_InjectView");
-        Info(
-            "Should this view be injected with Dependencies defined in the GameContainer.  e.g.GameManager.Resolve<MyViewModel>(ResolveName);");
-        EditorGUILayout.PropertyField(injectProperty, new GUIContent("Inject This View"));
+//        var injectProperty = serializedObject.FindProperty("_InjectView");
+//        Info(
+//            "Should this view be injected with Dependencies defined in the GameContainer.  e.g.GameManager.Resolve<MyViewModel>(ResolveName);");
+//        EditorGUILayout.PropertyField(injectProperty, new GUIContent("Inject This View"));
 
         //var useHashCode = serializedObject.FindProperty("_UseHashcodeAsIdentifier");
         //Info(
