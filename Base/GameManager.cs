@@ -152,7 +152,11 @@ public class GameManager : MonoBehaviour, ICommandDispatcher
     {
         get
         {
+#if UNITY_5_0
+			return true;
+#else
             return Application.HasProLicense();
+#endif
         }
     }
 
