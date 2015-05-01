@@ -22,7 +22,7 @@ public abstract class ViewBase : ViewContainer, IUFSerializable, IBindable
 
     Subject<Unit> _updateObservable;
 
-    private Subject<Transform> _transformObservable;
+    private Subject<Transform> _transformChangedObservable;
 
 
     /// <summary>
@@ -34,9 +34,9 @@ public abstract class ViewBase : ViewContainer, IUFSerializable, IBindable
         if (_updateObservable != null)
             _updateObservable.OnNext(Unit.Default);
 
-        if (TransformChangedObservable != null && transform.hasChanged)
+        if (_transformChangedObservable != null && transform.hasChanged)
         {
-            TransformChangedObservable.OnNext(transform);
+            _transformChangedObservable.OnNext(transform);
             transform.hasChanged = false;
         }
     }
@@ -110,8 +110,6 @@ public abstract class ViewBase : ViewContainer, IUFSerializable, IBindable
 
     [NonSerialized]
     private bool _shouldRebindOnEnable = false;
-
-    private IObservable<Transform> _transformChangedObservable;
 
     public List<IBindingProvider> BindingProviders
     {
@@ -374,8 +372,8 @@ public abstract class ViewBase : ViewContainer, IUFSerializable, IBindable
     /// </summary>
     public Subject<Transform> TransformChangedObservable
     {
-        get { return _transformObservable ?? (_transformObservable = new Subject<Transform>()); }
-        set { _transformObservable = value; }
+        get { return _transformChangedObservable ?? (_transformChangedObservable = new Subject<Transform>()); }
+        set { _transformChangedObservable = value; }
     }
 
     /// <summary>
