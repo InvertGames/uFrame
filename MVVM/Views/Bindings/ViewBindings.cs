@@ -401,7 +401,7 @@ namespace uFrame.MVVM.Bindings
             if (onlyWhenChanged)
             {
                 var d =
-                    sourceProperty.Where(p => sourceProperty.LastValue != sourceProperty.ObjectValue)
+                    sourceProperty.Where(p => Object.Equals(sourceProperty.LastValue, sourceProperty.ObjectValue) == false)
                         .First()
                         .Subscribe(_ => { disposable.Dispose(); });
                 return d;
@@ -426,8 +426,8 @@ namespace uFrame.MVVM.Bindings
             if (onlyWhenChanged)
             {
                 return
-                    bindable.AddBinding(
-                        property.Where(p => property.LastValue != property.ObjectValue).Subscribe(changed));
+                    bindable.AddBinding(						
+                        property.Where(p => Object.Equals(property.LastValue, property.ObjectValue) == false).Subscribe(changed));
             }
 
             return bindable.AddBinding(property.Subscribe(changed));
@@ -450,7 +450,7 @@ namespace uFrame.MVVM.Bindings
             {
                 return
                     bindable.AddBinding(
-                        property.Where(p => property.LastValue != property.ObjectValue).Subscribe(changed));
+                       property.Where(p => Object.Equals(property.LastValue, property.ObjectValue) == false).Subscribe(changed));
             }
 
             return bindable.AddBinding(property.Subscribe(changed));
