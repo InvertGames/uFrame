@@ -216,7 +216,7 @@ namespace uFrame.MVVM.Bindings
         /// <typeparam name="T"></typeparam>
         /// <param name="t"></param>
         /// <returns></returns>
-        public static T EnsureComponent<T>(this GameObject t) where T : MonoBehaviour
+        public static T EnsureComponent<T>(this GameObject t) where T : Component
         {
             if (t.GetComponent<T>() != null) return t.GetComponent<T>();
             return t.AddComponent<T>();
